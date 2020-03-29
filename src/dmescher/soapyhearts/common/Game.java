@@ -100,6 +100,10 @@ public class Game {
 		advstatus = ((roundcount % 4) << 4) + 15;
 	}
 	
+	public int getRound() {
+		return roundcount;
+	}
+	
 	public Hand getHand(int playerid) {
 		if ((playerid < 0) || (playerid > 3)) {
 			throw new ArrayIndexOutOfBoundsException("Invalid playerid for Game.getHand");

@@ -8,7 +8,6 @@ import javax.xml.ws.Service;
 import dmescher.soapyhearts.common.BasicGameStatus;
 import dmescher.soapyhearts.common.GameOpCodeStatus;
 import dmescher.soapyhearts.common.SHServer;
-import dmescher.soapyhearts.common.Hand;
 
 public class SHTestClient2a {
 
@@ -18,8 +17,11 @@ public class SHTestClient2a {
 		  Service service = Service.create(url,qname);
 		  qname = new QName("http://server.soapyhearts.dmescher/","SHServerImplPort");
 		  SHServer shs = service.getPort(qname,SHServer.class);
+
+		  // Player ID 0 only
 		  shs.init();
 		  int gameid = shs.spawnGame();
+
 		  String gamestr = shs.joinGame(gameid);
 		  char playerid_char = gamestr.charAt(2);
 		  String token = gamestr.substring(3);
