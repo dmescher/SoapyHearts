@@ -47,14 +47,38 @@ public class Hand {
 		return cards.elementAt(pos);
 	}
 	
+	public int cardpos(Card card) {
+		for (int count=0; count<cards.size(); count++) {
+			if (card.toString() == cards.elementAt(count).toString()) {
+				return count;
+			}
+		}
+		
+		return -1;
+	}
+	
 	public int getSize() {
 		return cards.size();
+	}
+	
+	public void removeCard(int pos) {
+		cards.removeElementAt(pos);
+	}
+	
+	public boolean removeCard(Card card) {
+		for (int count=0; count<cards.size(); count++) {
+			if (card.toString() == cards.elementAt(count).toString()) {
+				cards.removeElementAt(count);
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public void displayHand() {
 		for (byte count=0; count<getSize(); count++) {
 			char counter = (char) ('A' + count);
-			System.out.println("["+counter+"] -"+cardAt(count).getFullname());
+			System.out.println("["+counter+"] - "+cardAt(count).getFullname());
 		}		
 	}
 	
@@ -72,7 +96,7 @@ public class Hand {
 			} else {
 				System.out.println("[*] -"+cardAt(cardcount).getFullname());
 			}
-		}		
-		
+		}				
 	}
+	
 }

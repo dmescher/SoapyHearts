@@ -248,7 +248,36 @@ public class SHServerImpl implements SHServer {
 	@Override
 	public GameOpCodeStatus passCards(int id, int playerid, String token, 
 			                          String card1, String card2, String card3) {
-		// TODO:  Implement card passing
+		// TODO-In Progress:  Implement card passing
+		Game g = null;
+		try {
+			g=basicCheck(id,token);
+		} catch (NoSuchElementException e) {
+			return GameOpCodeStatus.BAD_GAMEID;
+		} catch (SecurityException e) {
+			return GameOpCodeStatus.BAD_TOKEN;
+		}
+		
+		if (g.getStatus() != BasicGameStatus.WAITING_GROUP) {
+			return GameOpCodeStatus.INVALID_STATE;
+		}
+		
+		// TODO:  Implement Game.passRequest(int playerid, Card[] cards)
+		Card[] cards = new Card[3];
+		try {
+			cards[0] = new Card(card1);
+			cards[1] = new Card(card2);
+			cards[2] = new Card(card3);
+		} catch (IllegalArgumentException e) {
+			return GameOpCodeStatus.BAD_PASS;
+		}
+		
+		try {
+			g.passRequest(id, cards);
+		} catch (IllegalStateException e) {  // If somebody tries to do two passes
+			return GameOpCodeStatus.INVALID_STATE;
+		}
+		
 		return GameOpCodeStatus.SUCCESS;
 	}
 }

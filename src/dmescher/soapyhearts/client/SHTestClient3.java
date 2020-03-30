@@ -9,11 +9,60 @@ import dmescher.soapyhearts.common.BasicGameStatus;
 import dmescher.soapyhearts.common.GameOpCodeStatus;
 import dmescher.soapyhearts.common.SHServer;
 import dmescher.soapyhearts.common.Hand;
+import dmescher.soapyhearts.common.Card;
 
 import java.util.Scanner;
 
 public class SHTestClient3 {
 	static Scanner scanner;
+
+	private static char getCharFromConsole() {
+		char ch = scanner.next().charAt(0);
+ 		return ch;
+		
+	}
+
+	private static Card[] pick3(Hand h) {
+		h.displayHand();
+		
+        int charcount = 0;
+        char[] charlist = new char[3];
+        while (charcount < 3) {
+        	System.out.print("Card letter>> ");
+        	char ch = getCharFromConsole();
+        	if (!(Character.isLetter(ch))) {
+        		System.out.println("Please input a letter."); continue;
+        	}
+        	ch = Character.toUpperCase(ch);
+        	if (ch > ((char)('A'+h.getSize()+1))) {
+        		System.out.println("Letter out of range."); continue;
+        	}
+        	boolean matched = false;
+        	for (int count=0; count<charcount; count++) {
+        		if (charlist[count] == ch) {
+        			matched = true;
+        		}
+        	}
+        	
+        	if (matched) {
+        		System.out.println("No duplication, please.");
+        	} else {
+        		charlist[charcount++] = ch;
+        	}
+        	
+        	h.displayHand(charlist);
+        }
+        
+        System.out.println("Selected cards:");
+        Card[] cards = new Card[3];
+        for (int count=0; count<3; count++) {
+        	System.out.println(h.cardAt(charlist[count]-'A').getFullname());
+        	cards[count] = h.cardAt(charlist[count]-'A');
+        }
+        
+		
+		return cards;
+	}
 
 	public static void main(String[] args) throws Exception {
 		  scanner = new Scanner(System.in);
@@ -79,8 +128,11 @@ public class SHTestClient3 {
 		  System.out.println("Hand = "+handstr);
 		  
 		  Hand hand = new Hand(handstr);
-          // TODO:  Implement hand display to console, and awaiting selection of 3
-		  // cards.
+		  Card[] passcards = pick3(hand);
+		  shs.passCards(gameid, playerid, token, 
+				        passcards[0].toString(), 
+				        passcards[1].toString(), 
+				        passcards[2].toString());
 	}
 
 }
