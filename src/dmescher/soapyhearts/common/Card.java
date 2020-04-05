@@ -11,12 +11,60 @@ public class Card {
 		this.fullname = fullname;
 	}
 	
+	public Card(String c) {
+	// Incoming string is two characters.  First character is rank, second character is
+	// suit.
+		String rankname = new String(""); // Init to shut up the compiler
+		String suitname = new String(""); // Init to shut up the compiler
+		switch (c.charAt(0)) {
+		// I could probably do something clever for 2-9, but I'd still have to handle
+		// 10-Ace separately.  This is easier.
+		case '2': rank=0; rankname = new String("TWO"); break;
+		case '3': rank=1; rankname = new String("THREE"); break;
+		case '4': rank=2; rankname = new String("FOUR"); break;
+		case '5': rank=3; rankname = new String("FIVE"); break;
+		case '6': rank=4; rankname = new String("SIX"); break;
+		case '7': rank=5; rankname = new String("SEVEN"); break;
+		case '8': rank=6; rankname = new String("EIGHT"); break;
+		case '9': rank=7; rankname = new String("NINE"); break;
+		case 't':
+		case 'T': rank=8; rankname = new String("TEN"); break;
+		case 'j':
+		case 'J': rank=9; rankname = new String("JACK"); break;
+		case 'q':
+		case 'Q': rank=10; rankname = new String("QUEEN"); break;
+		case 'k':
+		case 'K': rank=11; rankname = new String("KING"); break;
+		case 'a':
+		case 'A': rank=12; rankname = new String("ACE"); break;
+		default: throw new IllegalArgumentException("Invalid card rank");
+		}
+		
+		switch (c.charAt(1)) {
+		case 'c':
+		case 'C': suit=0; suitname = new String("CLUBS"); break;
+		case 'd':
+		case 'D': suit=1; suitname = new String("DIAMONDS"); break;
+		case 'h':
+		case 'H': suit=2; suitname = new String("HEARTS"); break;
+		case 's':
+		case 'S': suit=3; suitname = new String("SPADES"); break;
+		default: throw new IllegalArgumentException("Invalid suit");
+		}
+		
+		fullname = rankname + " OF " + suitname;
+	}
+	
 	public int getSuit() {
 		return suit;
 	}
 	
 	public int getRank() {
 		return rank;
+	}
+	
+	public String getFullname() {
+		return fullname;
 	}
 	
 	public String toString() {

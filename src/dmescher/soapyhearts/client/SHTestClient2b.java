@@ -17,6 +17,8 @@ public class SHTestClient2b {
 		  Service service = Service.create(url,qname);
 		  qname = new QName("http://server.soapyhearts.dmescher/","SHServerImplPort");
 		  SHServer shs = service.getPort(qname,SHServer.class);
+
+		  // Assumes a game has already been started.
 		  int gameid = shs.getRunningGames();
 		  String gamestr = shs.joinGame(gameid);
 

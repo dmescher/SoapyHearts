@@ -1,5 +1,5 @@
 package dmescher.soapyhearts.common;
 
 public enum GameOpCodeStatus {
-	SUCCESS, BAD_GAMEID, BAD_TOKEN, INVALID_STATE
+	SUCCESS, BAD_GAMEID, BAD_TOKEN, INVALID_STATE, BAD_PASS
 }

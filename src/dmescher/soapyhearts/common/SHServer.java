@@ -15,5 +15,7 @@ public interface SHServer {
   @WebMethod GameOpCodeStatus startGame(int id, String token);
   @WebMethod GameOpCodeStatus startRound(int id, String token);
   @WebMethod String getHand(int id, String token, int playerid);
-  @WebMethod GameOpCodeStatus passCards(int id, String token, String card1, String card2, String card3);
+  @WebMethod int getRoundNum(int id);
+  @WebMethod GameOpCodeStatus passCards(int id, int playerid, String token,  
+		                                String card1, String card2, String card3);
 }

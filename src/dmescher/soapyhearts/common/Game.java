@@ -8,6 +8,7 @@ public class Game {
 	int advstatus;
 	Deck deck;
 	Player[] players;
+	Card[][] passcards;
 
 	// We're going to assume a basic 4-player game of hearts.  If this expands, we'll
 	// want to modify the constructors to allow variable numbers of players, as well as
@@ -30,6 +31,9 @@ public class Game {
 			return 0;
 		}
 		if (status == BasicGameStatus.WAITING_GROUP) {
+			return advstatus;
+		}
+		if (status == BasicGameStatus.WAITING_TURN) {
 			return advstatus;
 		}
 		return -1;
@@ -97,7 +101,17 @@ public class Game {
 			players[count].setHand(deck.createHand(13));
 		}
 		status = BasicGameStatus.WAITING_GROUP;
-		advstatus = ((roundcount % 4) << 4) + 15;
+		advstatus = ((roundcount % 4) << 4) + 0xF;
+		passcards = new Card[4][3];
+		
+		// If this is round 4 / 8 / 12 / etc. we're not waiting on the group
+		if ((roundcount % 4) == 3) {
+			startTricks();
+		}
+	}
+	
+	public int getRound() {
+		return roundcount;
 	}
 	
 	public Hand getHand(int playerid) {
@@ -107,4 +121,73 @@ public class Game {
 		
 		return players[playerid].getHand();
 	}
+	
+	public synchronized int passRequest(int playerid, Card[] cards) {
+		if (((0x1 << playerid) & advstatus) == 0) {
+			throw new IllegalStateException("Pass request for playerid "+playerid+" already received.");
+		}
+		
+		for (int count=0; count<cards.length; count++) {
+			passcards[playerid][count] = cards[count];
+		}
+		
+		advstatus -= (0x1 << playerid); // Clear the appropriate bit in advstatus
+		if ((advstatus & 0xF) == 0) {
+			passTheCards();
+			startTricks();
+		}
+		return 0;
+	}
+	
+	private void passTheCards() {
+		for (int count1=0; count1<4; count1++) {
+			for (int count2=0; count2<3; count2++) {
+				players[count1].getHand().removeCard(passcards[count1][count2]);
+			}
+		}
+		
+		switch (roundcount % 4) {
+		case 0:  // Pass left
+			for (int count1=0; count1<4; count1++) {
+				for (int count2=0; count2<3; count2++) {
+					players[(count1+1) % 4].getHand().addCard(passcards[count1][count2]);
+				}
+			} break;
+		case 1:  // Pass right
+			for (int count1=0; count1<4; count1++) {
+				for (int count2=0; count2<3; count2++) {
+					players[(count1+3) % 4].getHand().addCard(passcards[count1][count2]);
+				}
+			} break;
+		case 2:  // Pass across
+			for (int count1=0; count1<4; count1++) {
+				for (int count2=0; count2<3; count2++) {
+					players[(count1+2) % 4].getHand().addCard(passcards[count1][count2]);
+				}
+			} break;
+		case 3:  // Stand pat, do nothing, shouldn't get here, as this method shouldn't even be called
+			break;
+		
+		default:  // This is impossible, given the switch.
+			break;			
+		} 		
+	}
+	
+	private int findACard(Card card) {
+		for (int count1=0; count1<4; count1++) {
+			for (int count2=0; count2<getHand(count1).getSize(); count2++) {
+				if (getHand(count1).cardAt(count2).toString() == card.toString()) {
+					return count1;
+				}
+			}
+		}
+		return -1;
+	}
+	
+	private void startTricks() {
+		int starting_player = findACard(new Card("2C"));
+		advstatus = starting_player;
+		status = BasicGameStatus.WAITING_TURN;
+	}
+	
 }
