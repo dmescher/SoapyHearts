@@ -155,8 +155,6 @@ public class SHServerImpl implements SHServer {
 	
 	private Game basicCheck(int id, String token) 
 	  throws NoSuchElementException, SecurityException {
-		// TODO:  Change return type to Game, and throw exceptions for
-		// Bad Game ID and Bad Token.  Catch those exceptions in the caller
 		Game g = findGame(id);
 			
 		if (g == null) {
@@ -212,7 +210,7 @@ public class SHServerImpl implements SHServer {
 	}
 
 	@Override
-	public String getHand(int gameid, String token, int playerid) {
+	public synchronized String getHand(int gameid, String token, int playerid) {
 		Game g = null;
 		try {
 			g=basicCheck(gameid,token);
@@ -227,6 +225,8 @@ public class SHServerImpl implements SHServer {
 		try {
 			rtnval = g.getHand(playerid).toString();
 		} catch (ArrayIndexOutOfBoundsException e) {
+			return null;
+		} catch (IllegalStateException e) {
 			return null;
 		}
 		
@@ -246,12 +246,11 @@ public class SHServerImpl implements SHServer {
 	}
 	
 	@Override
-	public GameOpCodeStatus passCards(int id, int playerid, String token, 
+	public GameOpCodeStatus passCards(int gameid, int playerid, String token, 
 			                          String card1, String card2, String card3) {
-		// TODO-In Progress:  Implement card passing
 		Game g = null;
 		try {
-			g=basicCheck(id,token);
+			g=basicCheck(gameid,token);
 		} catch (NoSuchElementException e) {
 			return GameOpCodeStatus.BAD_GAMEID;
 		} catch (SecurityException e) {
@@ -262,7 +261,6 @@ public class SHServerImpl implements SHServer {
 			return GameOpCodeStatus.INVALID_STATE;
 		}
 		
-		// TODO:  Implement Game.passRequest(int playerid, Card[] cards)
 		Card[] cards = new Card[3];
 		try {
 			cards[0] = new Card(card1);
@@ -273,11 +271,61 @@ public class SHServerImpl implements SHServer {
 		}
 		
 		try {
-			g.passRequest(id, cards);
+			g.passRequest(playerid, cards);
 		} catch (IllegalStateException e) {  // If somebody tries to do two passes
 			return GameOpCodeStatus.INVALID_STATE;
 		}
 		
 		return GameOpCodeStatus.SUCCESS;
+	}
+	
+	@Override
+	public GameOpCodeStatus playCard(int gameid, int playerid, String token, String card) {
+		// TODO:  Implement this method to be useful
+		Game g = null;
+		try {
+			g=basicCheck(gameid,token);
+		} catch (NoSuchElementException e) {
+			return GameOpCodeStatus.BAD_GAMEID;
+		} catch (SecurityException e) {
+			return GameOpCodeStatus.BAD_TOKEN;
+		}
+		if (g.getStatus() != BasicGameStatus.WAITING_TURN) {
+			return GameOpCodeStatus.INVALID_STATE;
+		}
+		
+		// Get the active Trick from the Game class.
+		int curtrick = g.getCurrentTrick();
+		Trick t = g.getTrick(curtrick);
+		
+		// Are we the lead for this trick? (Check the Trick class)
+		int leadplayer = t.getLeaderid();
+		boolean AreWeTheLead = (leadplayer == playerid) ? true : false;
+		
+		// Is this trick 0? (first trick)
+		boolean TrickZero = (curtrick == 0) ? true : false;
+		
+		// Is the card worth points?  (*H or QS)
+		// Is this card a heart? (*H)
+		// Does this player have non-points cards?
+		// Does this player have non-hearts cards?
+		// Has a points card been played?
+		// Iff this player is not the lead, do they have cards of the same suit as the lead?
+		// Does the played card match the lead
+		// Is the card 2C?
+		
+		// If Lead && Trick0 && 2C return SUCCESS
+		// If Lead && Trick0 && !2C return BAD_LEAD_2C
+		// If Trick0 && Points && NonPointsCards return BAD_CARD_POINTS
+		// If Lead && Heart && !PointsPlayed && NonHeartsCards return BAD_LEAD_H
+		// If !Lead && PlayerMatchLead && !CardMatchLead return BAD_CARD_SUIT
+		
+		// If Trick is complete, determine taker, assign taken cards to that player,
+		//   and set advstatus
+		// return SUCCESS
+		
+		
+		return GameOpCodeStatus.SUCCESS;
+		
 	}
 }

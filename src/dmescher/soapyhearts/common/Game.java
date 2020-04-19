@@ -1,14 +1,19 @@
 package dmescher.soapyhearts.common;
 
+import dmescher.soapyhearts.common.Trick;
+
 public class Game {
 	BasicGameStatus status;
 	int listid=-1;    // Set the game ID to -1 until it is set by the server.
 	int playercount=0;
 	int roundcount=0;
 	int advstatus;
+	int tricknum=0;
+	boolean heartsbroken=false;
 	Deck deck;
 	Player[] players;
 	Card[][] passcards;
+	Trick[] tricks;
 
 	// We're going to assume a basic 4-player game of hearts.  If this expands, we'll
 	// want to modify the constructors to allow variable numbers of players, as well as
@@ -114,15 +119,21 @@ public class Game {
 		return roundcount;
 	}
 	
-	public Hand getHand(int playerid) {
+	public Hand getHand(int playerid) throws IllegalStateException {
 		if ((playerid < 0) || (playerid > 3)) {
 			throw new ArrayIndexOutOfBoundsException("Invalid playerid for Game.getHand");
+		}
+		
+		if (players[playerid].getHand() == null) {
+			throw new IllegalStateException("Hand not initialized.");
 		}
 		
 		return players[playerid].getHand();
 	}
 	
 	public synchronized int passRequest(int playerid, Card[] cards) {
+		// Will accept the pass request.
+		// In addition, if all pass requests have been submitted, process them and prepare for start of play
 		if (((0x1 << playerid) & advstatus) == 0) {
 			throw new IllegalStateException("Pass request for playerid "+playerid+" already received.");
 		}
@@ -131,7 +142,9 @@ public class Game {
 			passcards[playerid][count] = cards[count];
 		}
 		
+		
 		advstatus -= (0x1 << playerid); // Clear the appropriate bit in advstatus
+		
 		if ((advstatus & 0xF) == 0) {
 			passTheCards();
 			startTricks();
@@ -140,9 +153,13 @@ public class Game {
 	}
 	
 	private void passTheCards() {
+		
 		for (int count1=0; count1<4; count1++) {
 			for (int count2=0; count2<3; count2++) {
-				players[count1].getHand().removeCard(passcards[count1][count2]);
+				
+				if (players[count1].getHand().removeCard(passcards[count1][count2]) == false) {
+					System.out.println("removal failed.");
+				}
 			}
 		}
 		
@@ -174,9 +191,10 @@ public class Game {
 	}
 	
 	private int findACard(Card card) {
+		// Returns the player who has the card
 		for (int count1=0; count1<4; count1++) {
 			for (int count2=0; count2<getHand(count1).getSize(); count2++) {
-				if (getHand(count1).cardAt(count2).toString() == card.toString()) {
+				if (getHand(count1).cardAt(count2).toString().compareTo(card.toString()) == 0) {
 					return count1;
 				}
 			}
@@ -185,9 +203,27 @@ public class Game {
 	}
 	
 	private void startTricks() {
+		// Start of play here.  Find 2C, set the status flags, and set play to start.
 		int starting_player = findACard(new Card("2C"));
 		advstatus = starting_player;
 		status = BasicGameStatus.WAITING_TURN;
+		tricknum = 0;
+		heartsbroken = false;
+		tricks = new Trick[13];
+		tricks[0] = new Trick(starting_player);
+		DEBUG.print("starting player is "+starting_player);
+	}
+	
+	public Trick getTrick(int tid) {
+		if (tid > tricknum) {
+			throw new IllegalStateException("Invalid trick id");
+		}
+		
+		return tricks[tid];
+	}
+	
+	public int getCurrentTrick() {
+		return tricknum;
 	}
 	
 }

@@ -18,4 +18,6 @@ public interface SHServer {
   @WebMethod int getRoundNum(int id);
   @WebMethod GameOpCodeStatus passCards(int id, int playerid, String token,  
 		                                String card1, String card2, String card3);
+  @WebMethod GameOpCodeStatus playCard(int gameid, int playerid, String token,
+		                               String card);
 }

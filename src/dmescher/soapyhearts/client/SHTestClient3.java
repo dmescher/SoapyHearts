@@ -124,15 +124,32 @@ public class SHTestClient3 {
 		  System.out.println("Player id: "+playerid);
 		  System.out.println("Security token: "+token);
 		  
+		  while (shs.checkStatus(gameid) != BasicGameStatus.WAITING_GROUP) {
+			  Thread.sleep(2000);
+		  }  // Need to wait while the cards are dealt.
+		  
 		  String handstr = shs.getHand(gameid, token, playerid);
 		  System.out.println("Hand = "+handstr);
 		  
 		  Hand hand = new Hand(handstr);
 		  Card[] passcards = pick3(hand);
-		  shs.passCards(gameid, playerid, token, 
+		  GameOpCodeStatus passstat = shs.passCards(gameid, playerid, token, 
 				        passcards[0].toString(), 
 				        passcards[1].toString(), 
 				        passcards[2].toString());
+		  
+		  switch (passstat) {
+		  case SUCCESS: System.out.println("Successful pass status reported"); break;
+		  case BAD_PASS: System.out.println("Bad pass status reported"); break;
+		  case INVALID_STATE:  System.out.println("Invalid state reported"); break;
+		  default:  System.out.println("Other bad status reported"); break;
+		  }
+		  
+		  while (shs.checkStatus(gameid) == BasicGameStatus.WAITING_GROUP) {
+			  Thread.sleep(2000);
+		  }
+		  handstr = shs.getHand(gameid,  token, playerid);
+		  System.out.println("New hand = "+handstr);
 	}
 
 }
