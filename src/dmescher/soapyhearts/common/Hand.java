@@ -100,4 +100,27 @@ public class Hand {
 		}				
 	}
 	
+	public int getSuitCards(int suit) {
+		int count = 0;
+		for (Card c : cards) {
+			if (c.getSuit() == suit) {  
+				count++;
+			}
+		}
+		return count;
+	}
+	
+	public int scoreCards() {
+		int count=0;
+		for (Card c: cards) {
+			if (c.getSuit() == 2) {
+				count++;
+			}
+			if (c.getSuit() == 3 && c.getRank() == 10) { // Queen of Spades
+				count+=13;
+			}
+		}
+		return count;
+	}
+	
 }

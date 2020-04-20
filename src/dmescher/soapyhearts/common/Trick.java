@@ -30,6 +30,14 @@ public class Trick {
 		}
 	}
 	
+	public int getLeadSuit() {
+		if (cards[0] == null || cardsplayed == 0) {
+			throw new IllegalStateException("No cards played, no lead suit to match");
+		}
+		
+		return cards[0].getSuit();
+	}
+	
 	public void playCard(Card c) {
 		if (cardsplayed == 4) {
 			throw new IllegalStateException("Trick overflow.");
@@ -46,7 +54,10 @@ public class Trick {
 				_winner = count;
 			}
 		}
-		winner = _winner;
+		// _winner is for capturing which card 1st/2nd/3rd/4th won the trick.
+		// winner is adjusted to find which actual player won the trick.
+		
+		winner = (_winner+lead_player) % 4;
 	}
 	
 	public int getCardCount() {

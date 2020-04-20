@@ -214,6 +214,10 @@ public class Game {
 		DEBUG.print("starting player is "+starting_player);
 	}
 	
+	public boolean HeartsBroken() {
+		return heartsbroken;
+	}
+	
 	public Trick getTrick(int tid) {
 		if (tid > tricknum) {
 			throw new IllegalStateException("Invalid trick id");
@@ -226,4 +230,7 @@ public class Game {
 		return tricknum;
 	}
 	
+	public void updateTrick(int tid, Trick t, Card c) {
+// TODO:  Implement this method with something useful		
+	}
 }

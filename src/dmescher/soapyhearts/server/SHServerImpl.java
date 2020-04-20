@@ -305,26 +305,85 @@ public class SHServerImpl implements SHServer {
 		// Is this trick 0? (first trick)
 		boolean TrickZero = (curtrick == 0) ? true : false;
 		
-		// Is the card worth points?  (*H or QS)
 		// Is this card a heart? (*H)
+		boolean IsHeart = (card.charAt(1) == 'H') ? true : false;
+		
+		// Is the card worth points?  (*H or QS)
+		boolean IsPoints = (card.startsWith("QS") || IsHeart) ? true : false;
+		
 		// Does this player have non-points cards?
 		// Does this player have non-hearts cards?
+		Hand h = g.getHand(playerid);
+		int handscore = h.scoreCards();
+		int heartscount = h.getSuitCards(2); // Hearts is suit 2
+		boolean HasOnlyHearts = (heartscount == h.getSize()) ? true : false;
+		boolean HasOnlyPoints = (HasOnlyHearts || handscore == (h.getSize()+12)) ? true : false;
+		// handscore, if the player has only points w/ one card being the QS will be 12 larger than their
+		// hand size.  Ex: If a player has 10 hearts + QS, the hand score is 23, hand size is 11.
+		
 		// Has a points card been played?
-		// Iff this player is not the lead, do they have cards of the same suit as the lead?
-		// Does the played card match the lead
-		// Is the card 2C?
+		boolean HeartsBroken = g.HeartsBroken();
+		
+		// Iff this player is not the lead, did they match the lead
+		boolean FollowPlay;
+		try {
+          FollowPlay = (!(leadplayer == playerid) && t.matchLead(new Card(card))) ? true : false;
+		} catch (IllegalStateException e) {
+			if (!(leadplayer == playerid)) {
+				throw new IllegalStateException ("Weirdness in playCard");
+			} else {
+				FollowPlay = true;
+			}
+		}
+
+        // Does this player have any cards that match the lead suit, iff they are not the lead?
+		boolean MatchSuit;
+		try {
+        	MatchSuit = (!(leadplayer == playerid) && (h.getSuitCards(t.getLeadSuit()) > 0)) ? true : false;
+        } catch (IllegalStateException e) {
+        	if (!(leadplayer == playerid)) {
+        		throw new IllegalStateException ("Weirdness2 in playCard");
+        	} else {
+        		MatchSuit = true;
+        	}
+        }
+
+        // Is the card 2C?
+        boolean IsDeuceClubs = (card.equals("2C")) ? true : false;
 		
 		// If Lead && Trick0 && 2C return SUCCESS
+        if (AreWeTheLead && TrickZero && IsDeuceClubs) {
+        	Card c = new Card(card);
+        	t.playCard(c);
+        	g.updateTrick(curtrick,t, c);
+        	return GameOpCodeStatus.SUCCESS;
+        }
+        
 		// If Lead && Trick0 && !2C return BAD_LEAD_2C
-		// If Trick0 && Points && NonPointsCards return BAD_CARD_POINTS
-		// If Lead && Heart && !PointsPlayed && NonHeartsCards return BAD_LEAD_H
-		// If !Lead && PlayerMatchLead && !CardMatchLead return BAD_CARD_SUIT
+        if (AreWeTheLead && TrickZero && !IsDeuceClubs) {
+        	return GameOpCodeStatus.BAD_LEAD_2C;
+        }
+        
+		// If Trick0 && Points && !PointsCards return BAD_CARD_POINTS
+        if (TrickZero && IsPoints && !HasOnlyPoints) {
+        	return GameOpCodeStatus.BAD_CARD_POINTS;
+        }
+        
+		// If Lead && Heart && !PointsPlayed && !OnlyHeartsCards return BAD_LEAD_H
+        if (AreWeTheLead && IsHeart && !HeartsBroken && !HasOnlyHearts) {
+        	return GameOpCodeStatus.BAD_LEAD_H;
+        }
+        
+		// If !Lead && !PlayerMatchLead && !MatchSuit  return BAD_CARD_SUIT
+        if (!AreWeTheLead && !FollowPlay && !MatchSuit) {
+        	return GameOpCodeStatus.BAD_CARD_SUIT;
+        }
 		
 		// If Trick is complete, determine taker, assign taken cards to that player,
 		//   and set advstatus
-		// return SUCCESS
-		
-		
+        Card c = new Card(card);
+        t.playCard(c);
+        g.updateTrick(curtrick, t, c);
 		return GameOpCodeStatus.SUCCESS;
 		
 	}
