@@ -2,7 +2,7 @@ package dmescher.soapyhearts.common;
 
 public enum BasicGameStatus {
   RUNNING_IDLE, WAITING_JOIN, START_GAME, GAME_STARTED, WAITING_GROUP, WAITING_TURN, 
-  GAME_OVER, GAME_FAULT, INVALID_GAME
+  GAME_OVER, GAME_FAULT, INVALID_GAME, PROCESSING
 }
 
 // RUNNING_IDLE:  Game is in a suspended state, waiting for a wakeup call
@@ -18,6 +18,7 @@ public enum BasicGameStatus {
 // GAME_OVER:  Game has completed successfully
 //  Advanced Status:  Returns an int.  Player ID of winner.
 // GAME_FAULT:  Game has encountered a fatal fault, game is over and not scorable.
-//  Advanced Status:  Further details, game specifc.
+//  Advanced Status:  Further details, game specific.
 // INVALID_GAME:  A bad game ID has been returned, but I don't want to throw an
 //   exception.
+// PROCESSING:  Trick processing in progress.

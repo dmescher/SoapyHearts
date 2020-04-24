@@ -39,4 +39,8 @@ public class Player {
 	public void setHand(Hand h) {
 		hand = h;
 	}
+	
+	public void takeCard(Card c) {
+		taken.add(c);
+	}
 }

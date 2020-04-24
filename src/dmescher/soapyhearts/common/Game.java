@@ -3,17 +3,18 @@ package dmescher.soapyhearts.common;
 import dmescher.soapyhearts.common.Trick;
 
 public class Game {
-	BasicGameStatus status;
-	int listid=-1;    // Set the game ID to -1 until it is set by the server.
-	int playercount=0;
-	int roundcount=0;
-	int advstatus;
-	int tricknum=0;
-	boolean heartsbroken=false;
-	Deck deck;
-	Player[] players;
-	Card[][] passcards;
-	Trick[] tricks;
+	private BasicGameStatus status;
+	private int listid=-1;    // Set the game ID to -1 until it is set by the server.
+	private int playercount=0;
+	private int roundcount=0;
+	private int advstatus;
+	private int tricknum=0;
+	private int nextplayer=-1;
+	private boolean heartsbroken=false;
+	private Deck deck;
+	private Player[] players;
+	private Card[][] passcards;
+	private Trick[] tricks;
 
 	// We're going to assume a basic 4-player game of hearts.  If this expands, we'll
 	// want to modify the constructors to allow variable numbers of players, as well as
@@ -230,7 +231,41 @@ public class Game {
 		return tricknum;
 	}
 	
-	public void updateTrick(int tid, Trick t, Card c) {
-// TODO:  Implement this method with something useful		
+	public void incrementPlayer() {
+		advstatus = (advstatus + 1) % 4;
+	}
+
+	public synchronized void processCurrentTrick() {
+		// The trick has a winner, take the relevant cards from the player hands,
+		// assign them to the winner, increment tricknum, and set advstatus
+		if (tricks[tricknum].getWinner() == -1) {
+			throw new IllegalStateException("Trick "+tricknum+" not won yet.");
+		}
+		
+		status = BasicGameStatus.PROCESSING;
+		Trick t = tricks[tricknum];
+		nextplayer = t.getWinner();
+		for (int count=0; count<4; count++) {
+			Card c = t.getCard(count);
+			int playerid = findACard(c);
+			players[playerid].getHand().removeCard(c);
+			players[playerid].takeCard(c);
+		}
+		tricknum++;
+		advstatus = 0xF;
+	}
+	
+	private void startNextTrick() {
+		if (advstatus != 0 || status != BasicGameStatus.PROCESSING) {
+			throw new IllegalStateException("Trick not fully acknowledged.");
+		}
+		advstatus = nextplayer;
+		status = BasicGameStatus.WAITING_TURN;
+		return;
+	}
+	
+	public int acknowledgeCompleteTrick(int playerid) {
+		// TODO:  Implement this method with something useful
+		return 0;
 	}
 }

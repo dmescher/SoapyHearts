@@ -294,6 +294,11 @@ public class SHServerImpl implements SHServer {
 			return GameOpCodeStatus.INVALID_STATE;
 		}
 		
+		// Are we the correct player?
+		if (g.getAdvStatus() != playerid) {
+			return GameOpCodeStatus.NOT_YOUR_TURN;
+		}
+		
 		// Get the active Trick from the Game class.
 		int curtrick = g.getCurrentTrick();
 		Trick t = g.getTrick(curtrick);
@@ -355,7 +360,7 @@ public class SHServerImpl implements SHServer {
         if (AreWeTheLead && TrickZero && IsDeuceClubs) {
         	Card c = new Card(card);
         	t.playCard(c);
-        	g.updateTrick(curtrick,t, c);
+        	g.incrementPlayer();
         	return GameOpCodeStatus.SUCCESS;
         }
         
@@ -383,8 +388,13 @@ public class SHServerImpl implements SHServer {
 		//   and set advstatus
         Card c = new Card(card);
         t.playCard(c);
-        g.updateTrick(curtrick, t, c);
+        if (t.getWinner() != -1) {
+        	g.processCurrentTrick();
+        } else {
+        	g.incrementPlayer();
+        }
 		return GameOpCodeStatus.SUCCESS;
-		
 	}
+	
+	// TODO:  Implement acknowledgeTrick
 }
