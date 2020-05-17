@@ -396,5 +396,67 @@ public class SHServerImpl implements SHServer {
 		return GameOpCodeStatus.SUCCESS;
 	}
 	
-	// TODO:  Implement acknowledgeTrick
+	@Override
+	public GameOpCodeStatus acknowledgeTrick(int gameid, int playerid, String token) {
+		Game g = null;
+		try {
+			g=basicCheck(gameid,token);
+		} catch (NoSuchElementException e) {
+			return GameOpCodeStatus.BAD_GAMEID;
+		} catch (SecurityException e) {
+			return GameOpCodeStatus.BAD_TOKEN;
+		}
+		
+		if (g.getStatus() != BasicGameStatus.PROCESSING) {
+			return GameOpCodeStatus.INVALID_STATE;
+		}
+		
+		try {
+			g.acknowledgeCompleteTrick(playerid);
+		} catch (IllegalStateException e) {
+			return GameOpCodeStatus.INVALID_STATE;
+		}
+		
+		return GameOpCodeStatus.SUCCESS;
+	}
+	
+	@Override
+	public String getTrick(int gameid, int trickid) {
+		Game g = findGame(gameid);
+		if (g == null) {
+			return null;
+		}
+		
+		Trick t = g.getTrick(trickid);
+		if (t == null) {
+			return null;
+		}
+		
+		return t.toString();
+	}
+	
+	@Override
+	public GameOpCodeStatus setName(int gameid, int playerid, String token, String name) {
+		Game g = null;
+		try {
+			g=basicCheck(gameid,token);
+		} catch (NoSuchElementException e) {
+			return GameOpCodeStatus.BAD_GAMEID;
+		} catch (SecurityException e) {
+			return GameOpCodeStatus.BAD_TOKEN;
+		}
+		
+        g.setPlayerName(playerid, name);
+        return GameOpCodeStatus.SUCCESS;
+	}
+	
+	@Override
+	public String getName(int gameid, int playerid) {
+		Game g = findGame(gameid);
+		if (g == null) {
+			return null;
+		}
+		
+		return g.getPlayerName(playerid);
+	}
 }

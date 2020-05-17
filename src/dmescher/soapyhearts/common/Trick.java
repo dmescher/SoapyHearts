@@ -18,6 +18,48 @@ public class Trick {
 		cards = new Card[4];
 	}
 	
+	public Trick(String s) {
+		// String in format of:
+		// lead+cards played+card0+card1+card2+card3
+		String[] _cards = s.split("[+]");
+		cards = new Card[4];
+		lead_player = Integer.parseInt(_cards[0]);
+		cardsplayed = Integer.parseInt(_cards[1]);
+		for (int count=0; count<cardsplayed; count++) {
+			if (_cards[count+2].length() > 0) {
+				cards[count] = new Card(_cards[count+2]);
+			}
+		}
+		
+		if (cardsplayed == 4) {
+			int _winner = 0;
+			for (int count=1; count<4; count++) {
+				if (cards[_winner].compare(cards[count],cards[0]) > 0) {
+					_winner = count;
+				}
+			}
+			// _winner is for capturing which card 1st/2nd/3rd/4th won the trick.
+			// winner is adjusted to find which actual player won the trick.
+			
+			winner = (_winner+lead_player) % 4;			
+		} else {
+			winner = -1;
+		}
+	}
+	
+	public String toString() {
+		String rtnval = new String(lead_player + "+" + cardsplayed);
+		
+		for (int count=0; count<4; count++) {
+			if (count < cardsplayed) {
+				rtnval.concat("+" + cards[count]);
+			} else {
+				rtnval.concat("+");
+			}
+		}
+		return rtnval;
+	}
+	
 	public boolean matchLead(Card c) {
 		if (cards[0] == null || cardsplayed == 0) {
 			throw new IllegalStateException("No cards played, cannot match lead");

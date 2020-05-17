@@ -4,6 +4,7 @@ import java.util.Vector;
 
 public class Player {
 	String token = null;
+	String playername = null;
 	int id = -1;
 	int pts = 0;
 	Hand hand;
@@ -16,12 +17,27 @@ public class Player {
 		taken = new Vector<Card>();
 	}
 
+	public Player(int _id, String _token, String _name) {
+		token = _token;
+		id = _id;
+		taken = new Vector<Card>();
+		playername = _name;
+	}
+
 	public void setToken(String _token) {
 		token = _token;
 	}
 	
 	public void setId(int _id) {
 		id = _id;
+	}
+	
+	public String getPlayerName() {
+		return playername;
+	}
+	
+	public void setPlayerName(String s) {
+		playername = s;
 	}
 	
 	public int checkToken(String incoming) {

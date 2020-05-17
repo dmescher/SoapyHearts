@@ -88,6 +88,14 @@ public class Game {
 		return -1;
 	}
 	
+	public void setPlayerName(int playerid, String name) {
+		players[playerid].setPlayerName(name);
+	}
+	
+	public String getPlayerName(int playerid) {
+		return players[playerid].getPlayerName();
+	}
+	
 	public synchronized void startGame() throws IllegalStateException {
 		if (status == BasicGameStatus.START_GAME) {
 			status = BasicGameStatus.GAME_STARTED;
@@ -251,7 +259,7 @@ public class Game {
 			players[playerid].getHand().removeCard(c);
 			players[playerid].takeCard(c);
 		}
-		tricknum++;
+		tricks[++tricknum] = new Trick(nextplayer);
 		advstatus = 0xF;
 	}
 	
@@ -264,8 +272,19 @@ public class Game {
 		return;
 	}
 	
-	public int acknowledgeCompleteTrick(int playerid) {
-		// TODO:  Implement this method with something useful
+	public synchronized int acknowledgeCompleteTrick(int playerid) {
+		if (((0x1 << playerid) & advstatus) == 0) {
+			return 0;  // No need to throw an exception, ack'ing a trick twice isn't
+			           // a problem.
+		}
+		
+		advstatus -= (0x1 << playerid); // Clear the appropriate bit in advstatus
+		
+		if (advstatus == 0) {
+			startNextTrick();
+		}
+		
 		return 0;
 	}
+	
 }

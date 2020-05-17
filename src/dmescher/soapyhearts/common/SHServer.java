@@ -12,6 +12,8 @@ public interface SHServer {
   @WebMethod BasicGameStatus checkStatus(int gameid);
   @WebMethod int checkAdvStatus(int gameid);
   @WebMethod String joinGame(int gameid);
+  @WebMethod GameOpCodeStatus setName(int gameid, int playerid, String token, String name);
+  @WebMethod String getName(int gameid, int playerid);
   @WebMethod GameOpCodeStatus startGame(int id, String token);
   @WebMethod GameOpCodeStatus startRound(int id, String token);
   @WebMethod String getHand(int gameid, String token, int playerid);
@@ -20,5 +22,6 @@ public interface SHServer {
 		                                String card1, String card2, String card3);
   @WebMethod GameOpCodeStatus playCard(int gameid, int playerid, String token,
 		                               String card);
-  // TODO:  Add @WebMethod int acknowledgeTrick(int gameid, int playerid, String token);
+  @WebMethod GameOpCodeStatus acknowledgeTrick(int gameid, int playerid, String token);
+  @WebMethod String getTrick(int gameid, int trickid);
 }
