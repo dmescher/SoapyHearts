@@ -3,11 +3,15 @@ package dmescher.soapyhearts.common;
 import java.io.*;
 
 public class DEBUG {
-	static boolean toconsole = true;
+	static boolean toconsole = false;
 	static FileOutputStream debuglogFile = null;
 	
     static public void setConsole(boolean val) {
     	toconsole = val;
+    }
+    
+    static public boolean checkConsole() {
+    	return toconsole;
     }
     
     static public void setFile(String filename) throws FileNotFoundException {

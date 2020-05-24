@@ -14,6 +14,7 @@ public interface SHServer {
   @WebMethod String joinGame(int gameid);
   @WebMethod GameOpCodeStatus setName(int gameid, int playerid, String token, String name);
   @WebMethod String getName(int gameid, int playerid);
+  @WebMethod String[] getAllNames(int gameid);
   @WebMethod GameOpCodeStatus startGame(int id, String token);
   @WebMethod GameOpCodeStatus startRound(int id, String token);
   @WebMethod String getHand(int gameid, String token, int playerid);

@@ -15,6 +15,7 @@ public class Game {
 	private Player[] players;
 	private Card[][] passcards;
 	private Trick[] tricks;
+	static private boolean isTest;
 
 	// We're going to assume a basic 4-player game of hearts.  If this expands, we'll
 	// want to modify the constructors to allow variable numbers of players, as well as
@@ -23,6 +24,10 @@ public class Game {
 	public Game() {
 		status = BasicGameStatus.WAITING_JOIN;
 		players = new Player[4];
+	}
+	
+	public static void setTest(boolean choice) {
+		isTest = choice;
 	}
 	
 	public BasicGameStatus getStatus() {
@@ -96,6 +101,14 @@ public class Game {
 		return players[playerid].getPlayerName();
 	}
 	
+	public String[] getAllPlayerNames() {
+		String[] rtnval = new String[4];
+		for (int count=0; count<4; count++) {
+			rtnval[count] = players[count].getPlayerName();
+		}
+		return rtnval;
+	}
+	
 	public synchronized void startGame() throws IllegalStateException {
 		if (status == BasicGameStatus.START_GAME) {
 			status = BasicGameStatus.GAME_STARTED;
@@ -109,8 +122,14 @@ public class Game {
 	}
 	
 	public synchronized void startRound() {
-		deck = Deck.standard52();
-		deck.shuffle();
+		if (!isTest) {
+			deck = Deck.standard52();
+			deck.shuffle();
+		} else {
+			deck = Deck.testDeck1();
+		}
+
+		
 		for (int count=0; count<4; count++) {
 			players[count].setHand(deck.createHand(13));
 		}

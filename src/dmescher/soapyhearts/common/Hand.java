@@ -76,6 +76,7 @@ public class Hand {
 		return false;
 	}
 	
+	@Deprecated
 	public void displayHand() {
 		for (byte count=0; count<getSize(); count++) {
 			char counter = (char) ('A' + count);
@@ -83,6 +84,15 @@ public class Hand {
 		}		
 	}
 	
+	public String[] handToArray() {
+		String[] rtnvar = new String[cards.size()];
+		for (int count=0; count<cards.size(); count++) {
+			rtnvar[count] = new String(cardAt(count).getFullname());
+		}
+		return rtnvar;
+	}
+	
+	@Deprecated
 	public void displayHand(char[] starred) {
 		for (byte cardcount=0; cardcount<getSize(); cardcount++) {
 			char counter = (char) ('A' + cardcount);

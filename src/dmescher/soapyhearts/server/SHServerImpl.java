@@ -13,7 +13,11 @@ public class SHServerImpl implements SHServer {
 	static Vector<Game> gameList;
 	static int runningGameCount;
 	static int startedGameCount;  // Use startedGameCount, as opposed to the gameList.size, because gameList can shrink if we maintain it.
-	
+	static boolean isTest = false;
+
+	static void setTest(boolean choice) {
+		isTest = choice;
+	}
 
 	@Override
 	public synchronized void init() {
@@ -458,5 +462,15 @@ public class SHServerImpl implements SHServer {
 		}
 		
 		return g.getPlayerName(playerid);
+	}
+	
+	@Override
+	public String[] getAllNames(int gameid) {
+		Game g = findGame(gameid);
+		if (g == null) {
+			return null;
+		}
+		
+		return g.getAllPlayerNames();
 	}
 }

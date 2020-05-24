@@ -2,7 +2,9 @@ package dmescher.soapyhearts.client;
 
 import dmescher.soapyhearts.client.StdinScanner;
 import java.util.Vector;
+import java.util.Arrays;
 import java.util.Scanner;
+import dmescher.soapyhearts.common.DEBUG;
 
 public class TextMenu {
 	private Vector<String> options;
@@ -20,9 +22,8 @@ public class TextMenu {
 	}
 	
 	public TextMenu(String[] _choices) {
-		options = new Vector<String>(_choices.length);
+		options = new Vector<String>(Arrays.asList(_choices));
 		
-		options.copyInto(_choices);
 		useLetters = true;
 		prompt = new String("");
 	}
@@ -61,6 +62,8 @@ public class TextMenu {
 		//  unless there are more than 26 options.
 		// TODO:  Implement the optional exclusion.  Not necessary for Hearts.
 		// TODO:  Implement numerics
+		
+		DEBUG.print("Menu size is "+getSize());
 		
 		for (int count=0; count<getSize(); count++) {
 			char choice = (char)('A'+count);
