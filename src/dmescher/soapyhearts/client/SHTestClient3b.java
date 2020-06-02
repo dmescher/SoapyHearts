@@ -78,7 +78,6 @@ public class SHTestClient3b {
 			  }
   			  if (s.equals("--DEBUG") == true) {
 				  debug = true; 
-				  break;
 			  }
 		  }
 		  
