@@ -7,6 +7,9 @@ import javax.xml.ws.Service;
 
 import dmescher.soapyhearts.common.DEBUG;
 import dmescher.soapyhearts.common.SHServer;
+import dmescher.soapyhearts.common.GameOpCodeStatus;
+
+/* Uses Deck.testDeck1 */
 
 public class SHTestClient4Group {
 
@@ -37,6 +40,40 @@ public class SHTestClient4Group {
         	  playerarr[count] = shs.joinGame(0);
         	  tokenarr[count] = playerarr[count].substring(3);
           }
+          GameOpCodeStatus x = shs.startGame(0, tokenarr[0]);
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure at startGame");
+          }
+          
+          shs.startRound(0, tokenarr[0]);
+          x = shs.passCards(0, 0, tokenarr[0], "2D", "2S", "2H");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on pass, player 0");
+          }
+          
+          x = shs.passCards(0, 1, tokenarr[1], "TC", "TD", "AH");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on pass, player 1");
+          }
+          
+          x = shs.passCards(0, 2, tokenarr[2], "QD", "KC", "KH");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on pass, player 2");
+          }
+          
+          x = shs.passCards(0, 3, tokenarr[3], "8H", "QC", "QH");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on pass, player 3");
+          }
+          
+          String handstr = shs.getHand(0, tokenarr[0], 0);
+          System.out.println("Player 0 Hand: "+handstr);
+          handstr = shs.getHand(0, tokenarr[1], 1);
+          System.out.println("Player 1 Hand: "+handstr);
+          handstr = shs.getHand(0, tokenarr[2], 2);
+          System.out.println("Player 2 Hand: "+handstr);
+          handstr = shs.getHand(0, tokenarr[3], 3);
+          System.out.println("Player 3 Hand: "+handstr);
 	}
 
 }
