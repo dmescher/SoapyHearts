@@ -48,6 +48,7 @@ public class Deck {
 		rtnval.setCard(10, new Card(0, 2, "DEUCE OF HEARTS")); // Passed
 		rtnval.setCard(11, new Card(11, 3, "KING OF SPADES"));
 		rtnval.setCard(12, new Card(11, 1, "KING OF DIAMONDS"));
+		// Rcvd from Player 3:  QC (Trick 0), 8H, QH
 		
 		// Player 1
 		rtnval.setCard(13, new Card(1, 0, "THREE OF CLUBS"));
@@ -62,7 +63,8 @@ public class Deck {
 		rtnval.setCard(22, new Card(8, 0, "TEN OF CLUBS"));  // Passed
 		rtnval.setCard(23, new Card(6, 1, "EIGHT OF DIAMONDS"));
 		rtnval.setCard(24, new Card(4, 2, "SIX OF HEARTS"));
-		rtnval.setCard(25, new Card(0, 0, "DEUCE OF CLUBS"));
+		rtnval.setCard(25, new Card(0, 0, "DEUCE OF CLUBS"));  // Lead - Trick 0
+		// Rcvd from Player 0:  2D, 2H, 2S
 		
 		// Player 2
 		rtnval.setCard(26, new Card(10, 1, "QUEEN OF DIAMONDS")); // Passed
@@ -75,9 +77,10 @@ public class Deck {
 		rtnval.setCard(33, new Card(4, 3, "SIX OF SPADES"));
 		rtnval.setCard(34, new Card(4, 0, "SIX OF CLUBS"));
 		rtnval.setCard(35, new Card(5, 2, "SEVEN OF HEARTS"));
-		rtnval.setCard(36, new Card(12, 0, "ACE OF CLUBS"));
+		rtnval.setCard(36, new Card(12, 0, "ACE OF CLUBS"));  // Trick 0
 		rtnval.setCard(37, new Card(8, 2, "TEN OF HEARTS"));
 		rtnval.setCard(38, new Card(2, 3, "FOUR OF SPADES"));
+		// Rcvd from Player 1:  TC, TD, AH
 		
 		// Player 3
 		rtnval.setCard(39, new Card(6, 2, "EIGHT OF HEARTS")); // Passed
@@ -93,6 +96,7 @@ public class Deck {
 		rtnval.setCard(49, new Card(9, 0, "JACK OF CLUBS"));
 		rtnval.setCard(50, new Card(2, 1, "FOUR OF DIAMONDS"));
 		rtnval.setCard(51, new Card(10, 2, "QUEEN OF HEARTS")); // Passed
+		// Rcvd from Player 2:  KC (Trick 0), QD, KH
 		
 		return rtnval;
 	}

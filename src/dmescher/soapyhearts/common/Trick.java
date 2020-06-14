@@ -52,11 +52,13 @@ public class Trick {
 		
 		for (int count=0; count<4; count++) {
 			if (count < cardsplayed) {
-				rtnval.concat("+" + cards[count]);
+				rtnval = rtnval.concat("+" + cards[count]);
 			} else {
-				rtnval.concat("+");
+				rtnval = rtnval.concat("+");
 			}
 		}
+		
+		DEBUG.print("Trick.toString() = "+rtnval);
 		return rtnval;
 	}
 	

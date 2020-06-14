@@ -55,6 +55,7 @@ public class SHServerImpl implements SHServer {
 	
 	@Override
 	public synchronized int spawnGame() {
+		DEBUG.print("spawnGame "+startedGameCount);
 		Game newGame = new Game();
 		
 		// If someone got sloppy, init the list.
@@ -133,7 +134,7 @@ public class SHServerImpl implements SHServer {
 		Game g = findGame(id);
 		
 		if (g == null) {
-			return new String(new Integer(id).toString()+" XVOIDVOID");
+			return new String(new Integer(id).toString()+" XVOIDVOID");  // Tested, 13 Jun
 		}
 		
 		// We've established we have the correct game object.
@@ -177,20 +178,28 @@ public class SHServerImpl implements SHServer {
 		Game g = findGame(id);
 		
 		if (g == null) {
+			DEBUG.print("startGame ERROR - BAD_GAMEID");
+			DEBUG.print("id = "+id+"  token = "+token);
 			return GameOpCodeStatus.BAD_GAMEID;
 		}
 		
 		if (g.checkToken(token) < 0) {
+			DEBUG.print("startGame ERROR - BAD_TOKEN");
+			DEBUG.print("id = "+id+"  token = "+token);
 			return GameOpCodeStatus.BAD_TOKEN;
 		}
 		
 		if (g.getStatus() != BasicGameStatus.START_GAME) {
+			DEBUG.print("startGame ERROR - INVALID_STATE1");
+			DEBUG.print("id = "+id+"  token = "+token);
 			return GameOpCodeStatus.INVALID_STATE;
 		}
 		
 		try {
 			g.startGame();
 		} catch (IllegalStateException e) {
+			DEBUG.print("startGame ERROR - INVALID_STATE2 - Rcvd IllegalStateException");
+			DEBUG.print("id = "+id+"  token = "+token);
 			return GameOpCodeStatus.INVALID_STATE;
 		}
 		
@@ -247,6 +256,17 @@ public class SHServerImpl implements SHServer {
 		}
 		
 		return g.getRound();
+	}
+	
+	@Override
+	public int getCurrentTrickNum(int gameid) {
+		Game g = findGame(gameid);
+		
+		if (g == null) {
+			return -1;
+		}
+		
+		return g.getCurrentTrick();
 	}
 	
 	@Override
