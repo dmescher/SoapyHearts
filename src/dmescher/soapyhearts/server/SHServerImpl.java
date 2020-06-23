@@ -305,7 +305,6 @@ public class SHServerImpl implements SHServer {
 	
 	@Override
 	public GameOpCodeStatus playCard(int gameid, int playerid, String token, String card) {
-		// TODO:  Implement this method to be useful
 		Game g = null;
 		try {
 			g=basicCheck(gameid,token);
@@ -359,7 +358,7 @@ public class SHServerImpl implements SHServer {
           FollowPlay = (!(leadplayer == playerid) && t.matchLead(new Card(card))) ? true : false;
 		} catch (IllegalStateException e) {
 			if (!(leadplayer == playerid)) {
-				throw new IllegalStateException ("Weirdness in playCard");
+				throw new IllegalStateException ("Weirdness in playCard, should not see this");
 			} else {
 				FollowPlay = true;
 			}
@@ -371,7 +370,7 @@ public class SHServerImpl implements SHServer {
         	MatchSuit = (!(leadplayer == playerid) && (h.getSuitCards(t.getLeadSuit()) > 0)) ? true : false;
         } catch (IllegalStateException e) {
         	if (!(leadplayer == playerid)) {
-        		throw new IllegalStateException ("Weirdness2 in playCard");
+        		throw new IllegalStateException ("Weirdness2 in playCard, should not see this");
         	} else {
         		MatchSuit = true;
         	}
@@ -390,21 +389,35 @@ public class SHServerImpl implements SHServer {
         
 		// If Lead && Trick0 && !2C return BAD_LEAD_2C
         if (AreWeTheLead && TrickZero && !IsDeuceClubs) {
+        	DEBUG.print("playCard: BAD_LEAD_2C");
         	return GameOpCodeStatus.BAD_LEAD_2C;
         }
         
 		// If Trick0 && Points && !PointsCards return BAD_CARD_POINTS
         if (TrickZero && IsPoints && !HasOnlyPoints) {
+        	DEBUG.print("playCard: BAD_CARD_POINTS");
         	return GameOpCodeStatus.BAD_CARD_POINTS;
         }
         
 		// If Lead && Heart && !PointsPlayed && !OnlyHeartsCards return BAD_LEAD_H
         if (AreWeTheLead && IsHeart && !HeartsBroken && !HasOnlyHearts) {
+        	DEBUG.print("playCard: BAD_LEAD_H");
         	return GameOpCodeStatus.BAD_LEAD_H;
         }
         
-		// If !Lead && !PlayerMatchLead && !MatchSuit  return BAD_CARD_SUIT
-        if (!AreWeTheLead && !FollowPlay && !MatchSuit) {
+		// If !Lead && !PlayerMatchLead && MatchSuit  return BAD_CARD_SUIT
+        if (!AreWeTheLead && !FollowPlay && MatchSuit) {
+        	DEBUG.print("playCard: BAD_CARD_SUIT");
+        	if (FollowPlay) {
+        		DEBUG.print("playCard: FollowPlay is true");
+        	} else {
+        		DEBUG.print("playCard: FollowPlay is false");
+        	}
+        	if (MatchSuit) {
+        	    DEBUG.print("playCard: MatchSuit is true");
+        	} else {
+        		DEBUG.print("playCard: MatchSuit is false");
+        	}
         	return GameOpCodeStatus.BAD_CARD_SUIT;
         }
 		
