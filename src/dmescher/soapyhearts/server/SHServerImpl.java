@@ -294,6 +294,15 @@ public class SHServerImpl implements SHServer {
 			return GameOpCodeStatus.BAD_PASS;
 		}
 		
+		Hand h = g.getHand(playerid);
+		DEBUG.print("PassCards: handstr for player "+playerid+" is "+h.toString());
+		DEBUG.print("PassCards: pos for cards[0] ("+card1+") = "+h.cardpos(cards[0]));
+		DEBUG.print("PassCards: pos for cards[1] ("+card2+") = "+h.cardpos(cards[1]));
+		DEBUG.print("PassCards: pos for cards[2] ("+card3+") = "+h.cardpos(cards[2]));
+		if (h.cardpos(cards[0]) == -1 || h.cardpos(cards[1]) == -1 || h.cardpos(cards[2]) == -1) {
+			return GameOpCodeStatus.BAD_PASS;
+		}
+		
 		try {
 			g.passRequest(playerid, cards);
 		} catch (IllegalStateException e) {  // If somebody tries to do two passes
@@ -349,7 +358,7 @@ public class SHServerImpl implements SHServer {
 		// handscore, if the player has only points w/ one card being the QS will be 12 larger than their
 		// hand size.  Ex: If a player has 10 hearts + QS, the hand score is 23, hand size is 11.
 		
-		// Has a points card been played?
+		// Has a hearts card been played?
 		boolean HeartsBroken = g.HeartsBroken();
 		
 		// Iff this player is not the lead, did they match the lead
@@ -402,6 +411,17 @@ public class SHServerImpl implements SHServer {
 		// If Lead && Heart && !PointsPlayed && !OnlyHeartsCards return BAD_LEAD_H
         if (AreWeTheLead && IsHeart && !HeartsBroken && !HasOnlyHearts) {
         	DEBUG.print("playCard: BAD_LEAD_H");
+        	if (HeartsBroken) {
+        		DEBUG.print("playCard: HeartsBroken true");
+        	} else {
+        		DEBUG.print("playCard: HeartsBroken false");
+        	}
+        	
+        	if (HasOnlyHearts) {
+        		DEBUG.print("playCard: HasOnlyHearts true");
+        	} else {
+        		DEBUG.print("playCard: HasOnlyHearts false");
+        	}
         	return GameOpCodeStatus.BAD_LEAD_H;
         }
         
@@ -470,6 +490,11 @@ public class SHServerImpl implements SHServer {
 		}
 		
 		return t.toString();
+	}
+	
+	@Override
+	public GameOpCodeStatus scoreHand(int gameid, int playerid) {
+		return GameOpCodeStatus.SUCCESS;
 	}
 	
 	@Override

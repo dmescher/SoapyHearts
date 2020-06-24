@@ -87,6 +87,7 @@ public class Game {
 	}
 	
 	public int checkToken(int id, String token) {
+		if (id > 3) return -1;  // OutOfBounds, but we don't want to throw an exception
 		if (players[id] == null) return -1;
 		if (players[id].checkToken(token) == 0)
 			return id;
@@ -94,10 +95,12 @@ public class Game {
 	}
 	
 	public void setPlayerName(int playerid, String name) {
+		if (playerid > 3) return; // OutOfBounds, but we don't want to throw an exception
 		players[playerid].setPlayerName(name);
 	}
 	
 	public String getPlayerName(int playerid) {
+		if (playerid > 3) return null;  // OutOfBounds, but we don't want to throw an exception
 		return players[playerid].getPlayerName();
 	}
 	
@@ -277,8 +280,19 @@ public class Game {
 			int playerid = findACard(c);
 			players[playerid].getHand().removeCard(c);
 			players[playerid].takeCard(c);
+			
+			// We need to check if the card is a heart and set it if it is. 
+			// We do it here because we're already looping through all four cards of the trick
+			if (c.getSuit() == 2) { // Is Hearts
+				heartsbroken = true;
+			}
 		}
-		tricks[++tricknum] = new Trick(nextplayer);
+		if (tricknum < 12) {
+		    tricks[++tricknum] = new Trick(nextplayer);
+		} else {
+			status = BasicGameStatus.SCORING;
+			tricknum++;
+		}
 		advstatus = 0xF;
 	}
 	
@@ -304,6 +318,12 @@ public class Game {
 		}
 		
 		return 0;
+	}
+	
+	public int scorePlayer(int playerid) {
+		if (playerid > 3) return 0;  // OutOfBounds, but we're not throwing an exception
+		Hand h = players[playerid].getTaken();
+		return h.scoreCards();
 	}
 	
 }

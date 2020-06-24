@@ -8,6 +8,7 @@ import javax.xml.ws.Service;
 import dmescher.soapyhearts.common.DEBUG;
 import dmescher.soapyhearts.common.SHServer;
 import dmescher.soapyhearts.common.GameOpCodeStatus;
+import dmescher.soapyhearts.common.BasicGameStatus;
 
 /* Uses Deck.testDeck1 */
 
@@ -235,7 +236,228 @@ public class SHTestClient4Group {
           y = shs.checkAdvStatus(gamecount);
           System.out.println("Lead player, trick 5 (0) "+y);
 
+          // Trick 5
+          x = shs.playCard(gamecount, 0, tokenarr[0], "QS");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 5, player 0");
+          }
+          x = shs.playCard(gamecount, 1, tokenarr[1], "2H");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 5, player 1");
+          }
+          x = shs.playCard(gamecount, 2, tokenarr[2], "6S");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 5, player 2");
+          }
+          x = shs.playCard(gamecount, 3, tokenarr[3], "5S");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 5, player 3");
+          }
+          trickstr = shs.getTrick(gamecount, 5);
+          System.out.println("Trick 5 (0+4+QS+2H+6S+5S): "+trickstr);
+          for (int count=0; count<4; count++) {
+        	  GameOpCodeStatus xx = shs.acknowledgeTrick(gamecount, count, tokenarr[count]);
+        	  if (xx != GameOpCodeStatus.SUCCESS) {
+        		  System.out.println("Failure on trick 5 acknowledge, player "+count);
+        	  }
+          }
+          y = shs.checkAdvStatus(gamecount);
+          System.out.println("Lead player, trick 6 (0) "+y);
+
+          // Trick 6
+          x = shs.playCard(gamecount, 0, tokenarr[0], "JS");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 6, player 0");
+          }
+          x = shs.playCard(gamecount, 1, tokenarr[1], "6H");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 6, player 1");
+          }
+          x = shs.playCard(gamecount, 2, tokenarr[2], "TH");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 6, player 2");
+          }
+          x = shs.playCard(gamecount, 3, tokenarr[3], "KH");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 6, player 3");
+          }
+          trickstr = shs.getTrick(gamecount, 6);
+          System.out.println("Trick 6 (0+4+JS+6H+TH+KH): "+trickstr);
+          for (int count=0; count<4; count++) {
+        	  GameOpCodeStatus xx = shs.acknowledgeTrick(gamecount, count, tokenarr[count]);
+        	  if (xx != GameOpCodeStatus.SUCCESS) {
+        		  System.out.println("Failure on trick 6 acknowledge, player "+count);
+        	  }
+          }
+          y = shs.checkAdvStatus(gamecount);
+          System.out.println("Lead player, trick 7 (0) "+y);
+
+          // Trick 7
+          x = shs.playCard(gamecount, 0, tokenarr[0], "8S");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 7, player 0");
+          }
+          x = shs.playCard(gamecount, 1, tokenarr[1], "2D");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 7, player 1");
+          }
+          x = shs.playCard(gamecount, 2, tokenarr[2], "9C");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 7, player 2");
+          }
+          x = shs.playCard(gamecount, 3, tokenarr[3], "5H");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 7, player 3");
+          }
+          trickstr = shs.getTrick(gamecount, 7);
+          System.out.println("Trick 7 (0+4+8S+2D+9C+5H): "+trickstr);
+          for (int count=0; count<4; count++) {
+        	  GameOpCodeStatus xx = shs.acknowledgeTrick(gamecount, count, tokenarr[count]);
+        	  if (xx != GameOpCodeStatus.SUCCESS) {
+        		  System.out.println("Failure on trick 7 acknowledge, player "+count);
+        	  }
+          }
+          y = shs.checkAdvStatus(gamecount);
+          System.out.println("Lead player, trick 8 (0) "+y);
           
+          // Trick 8
+          x = shs.playCard(gamecount, 0, tokenarr[0], "JD");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 8, player 0");
+          }
+          x = shs.playCard(gamecount, 1, tokenarr[1], "6D");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 8, player 1");
+          }
+          x = shs.playCard(gamecount, 2, tokenarr[2], "7H");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 8, player 2");
+          }
+          x = shs.playCard(gamecount, 3, tokenarr[3], "4D");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 8, player 3");
+          }
+          trickstr = shs.getTrick(gamecount, 8);
+          System.out.println("Trick 8 (0+4+JD+6D+7H+4D): "+trickstr);
+          for (int count=0; count<4; count++) {
+        	  GameOpCodeStatus xx = shs.acknowledgeTrick(gamecount, count, tokenarr[count]);
+        	  if (xx != GameOpCodeStatus.SUCCESS) {
+        		  System.out.println("Failure on trick 8 acknowledge, player "+count);
+        	  }
+          }
+          y = shs.checkAdvStatus(gamecount);
+          System.out.println("Lead player, trick 9 (0) "+y);
+
+          // Trick 9
+          x = shs.playCard(gamecount, 0, tokenarr[0], "QH");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 9, player 0");
+          }
+          x = shs.playCard(gamecount, 1, tokenarr[1], "8C");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 9, player 1");
+          }
+          x = shs.playCard(gamecount, 2, tokenarr[2], "9H");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 9, player 2");
+          }
+          x = shs.playCard(gamecount, 3, tokenarr[3], "4H");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 9, player 3");
+          }
+          trickstr = shs.getTrick(gamecount, 9);
+          System.out.println("Trick 9 (0+4+QH+8C+9H+4H): "+trickstr);
+          for (int count=0; count<4; count++) {
+        	  GameOpCodeStatus xx = shs.acknowledgeTrick(gamecount, count, tokenarr[count]);
+        	  if (xx != GameOpCodeStatus.SUCCESS) {
+        		  System.out.println("Failure on trick 9 acknowledge, player "+count);
+        	  }
+          }
+          y = shs.checkAdvStatus(gamecount);
+          System.out.println("Lead player, trick 10 (0) "+y);
+
+          // Trick 10
+          x = shs.playCard(gamecount, 0, tokenarr[0], "3D");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 10, player 0");
+          }
+          x = shs.playCard(gamecount, 1, tokenarr[1], "5D");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 10, player 1");
+          }
+          x = shs.playCard(gamecount, 2, tokenarr[2], "TC");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 10, player 2");
+          }
+          x = shs.playCard(gamecount, 3, tokenarr[3], "JH");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 10, player 3");
+          }
+          trickstr = shs.getTrick(gamecount, 10);
+          System.out.println("Trick 10 (0+4+3D+5D+TC+JH): "+trickstr);
+          for (int count=0; count<4; count++) {
+        	  GameOpCodeStatus xx = shs.acknowledgeTrick(gamecount, count, tokenarr[count]);
+        	  if (xx != GameOpCodeStatus.SUCCESS) {
+        		  System.out.println("Failure on trick 10 acknowledge, player "+count);
+        	  }
+          }
+          y = shs.checkAdvStatus(gamecount);
+          System.out.println("Lead player, trick 11 (1) "+y);
+          
+          // Trick 11
+          x = shs.playCard(gamecount, 1, tokenarr[1], "4C");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 11, player 1");
+          }
+          x = shs.playCard(gamecount, 2, tokenarr[2], "6C");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 11, player 2");
+          }
+          x = shs.playCard(gamecount, 3, tokenarr[3], "JC");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 11, player 3");
+          }
+          x = shs.playCard(gamecount, 0, tokenarr[0], "8H");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 11, player 0");
+          }
+          trickstr = shs.getTrick(gamecount, 11);
+          System.out.println("Trick 11 (0+4+4C+6C+JC+8H): "+trickstr);
+          for (int count=0; count<4; count++) {
+        	  GameOpCodeStatus xx = shs.acknowledgeTrick(gamecount, count, tokenarr[count]);
+        	  if (xx != GameOpCodeStatus.SUCCESS) {
+        		  System.out.println("Failure on trick 11 acknowledge, player "+count);
+        	  }
+          }
+          y = shs.checkAdvStatus(gamecount);
+          System.out.println("Lead player, trick 12 (3) "+y);
+          
+          // Trick 12
+          x = shs.playCard(gamecount, 3, tokenarr[3], "7C");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 12, player 3");
+          }
+          x = shs.playCard(gamecount, 0, tokenarr[0], "3H");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 12, player 0");
+          }
+          x = shs.playCard(gamecount, 1, tokenarr[1], "3C");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 12, player 1");
+          }
+          x = shs.playCard(gamecount, 2, tokenarr[2], "5C");
+          if (x != GameOpCodeStatus.SUCCESS) {
+        	  System.out.println("Failure on trick 12, player 3");
+          }
+          trickstr = shs.getTrick(gamecount, 12);
+          System.out.println("Trick 12 (0+4+7C+3H+3C+5C): "+trickstr);
+          // Trick 12 doesn't need to acknowledge the trick
+          
+          BasicGameStatus gs = shs.checkStatus(gamecount);
+          if (gs != BasicGameStatus.SCORING) {
+        	  System.out.println("Weird status at end of round.");
+          }
+
 	}
 
 }

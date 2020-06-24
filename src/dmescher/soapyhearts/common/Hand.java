@@ -49,7 +49,7 @@ public class Hand {
 	
 	public int cardpos(Card card) {
 		for (int count=0; count<cards.size(); count++) {
-			if (card.toString() == cards.elementAt(count).toString()) {
+			if (card.toString().compareTo(cards.elementAt(count).toString()) == 0) {
 				return count;
 			}
 		}

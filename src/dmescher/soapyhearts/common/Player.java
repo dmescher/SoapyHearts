@@ -59,4 +59,12 @@ public class Player {
 	public void takeCard(Card c) {
 		taken.add(c);
 	}
+	
+	public Hand getTaken() {
+		return new Hand(taken);
+	}
+	
+	public void clearTaken() {
+		taken.clear();
+	}
 }
