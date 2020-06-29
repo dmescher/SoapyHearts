@@ -285,6 +285,10 @@ public class SHServerImpl implements SHServer {
 			return GameOpCodeStatus.INVALID_STATE;
 		}
 		
+		if (card1.isEmpty() || card2.isEmpty() || card3.isEmpty() ) {
+			return GameOpCodeStatus.BAD_PASS;
+		}
+		
 		Card[] cards = new Card[3];
 		try {
 			cards[0] = new Card(card1);
@@ -331,6 +335,11 @@ public class SHServerImpl implements SHServer {
 			return GameOpCodeStatus.NOT_YOUR_TURN;
 		}
 		
+		// Check to see whether the card string is empty
+		if (card.isEmpty()) {
+			return GameOpCodeStatus.BLANK_CARD;
+		}
+				
 		// Get the active Trick from the Game class.
 		int curtrick = g.getCurrentTrick();
 		Trick t = g.getTrick(curtrick);
@@ -351,6 +360,22 @@ public class SHServerImpl implements SHServer {
 		// Does this player have non-points cards?
 		// Does this player have non-hearts cards?
 		Hand h = g.getHand(playerid);
+		
+		// While we just retrieved the hand, make sure we actually have the card in this hand.
+		Card c;
+		try {
+			c = new Card(card);
+		} catch (StringIndexOutOfBoundsException e) {
+			DEBUG.print("StringIndexOutOfBoundsException, game "+gameid+", player "+playerid+" card "+card);
+			return GameOpCodeStatus.INVALID_CARD;
+		} catch (IllegalArgumentException e) {
+			DEBUG.print("IllegalArgumentException, game "+gameid+", player "+playerid+" card "+card);
+			return GameOpCodeStatus.INVALID_CARD;
+		}
+		if (h.cardpos(c) == -1) { // This player does not have the card in question
+			return GameOpCodeStatus.NOT_YOUR_CARD;
+		}
+
 		int handscore = h.scoreCards();
 		int heartscount = h.getSuitCards(2); // Hearts is suit 2
 		boolean HasOnlyHearts = (heartscount == h.getSize()) ? true : false;
@@ -364,7 +389,7 @@ public class SHServerImpl implements SHServer {
 		// Iff this player is not the lead, did they match the lead
 		boolean FollowPlay;
 		try {
-          FollowPlay = (!(leadplayer == playerid) && t.matchLead(new Card(card))) ? true : false;
+          FollowPlay = (!(leadplayer == playerid) && t.matchLead(c)) ? true : false;
 		} catch (IllegalStateException e) {
 			if (!(leadplayer == playerid)) {
 				throw new IllegalStateException ("Weirdness in playCard, should not see this");
@@ -390,7 +415,6 @@ public class SHServerImpl implements SHServer {
 		
 		// If Lead && Trick0 && 2C return SUCCESS
         if (AreWeTheLead && TrickZero && IsDeuceClubs) {
-        	Card c = new Card(card);
         	t.playCard(c);
         	g.incrementPlayer();
         	return GameOpCodeStatus.SUCCESS;
@@ -443,7 +467,6 @@ public class SHServerImpl implements SHServer {
 		
 		// If Trick is complete, determine taker, assign taken cards to that player,
 		//   and set advstatus
-        Card c = new Card(card);
         t.playCard(c);
         if (t.getWinner() != -1) {
         	g.processCurrentTrick();

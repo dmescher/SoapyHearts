@@ -83,7 +83,7 @@ public class SHTestClient4Group {
           y = shs.getCurrentTrickNum(gamecount);
           System.out.println("Trick (0) "+y);
           
-          // Tri
+          // Trick 0
           x = shs.playCard(gamecount, 1, tokenarr[1], "2C");
           if (x != GameOpCodeStatus.SUCCESS) {
         	  System.out.println("Failure on trick 0, player 1");
