@@ -13,7 +13,11 @@ public class SHServerImpl implements SHServer {
 	static Vector<Game> gameList;
 	static int runningGameCount;
 	static int startedGameCount;  // Use startedGameCount, as opposed to the gameList.size, because gameList can shrink if we maintain it.
-	
+	static boolean isTest = false;
+
+	static void setTest(boolean choice) {
+		isTest = choice;
+	}
 
 	@Override
 	public synchronized void init() {
@@ -51,6 +55,7 @@ public class SHServerImpl implements SHServer {
 	
 	@Override
 	public synchronized int spawnGame() {
+		DEBUG.print("spawnGame "+startedGameCount);
 		Game newGame = new Game();
 		
 		// If someone got sloppy, init the list.
@@ -129,7 +134,7 @@ public class SHServerImpl implements SHServer {
 		Game g = findGame(id);
 		
 		if (g == null) {
-			return new String(new Integer(id).toString()+" XVOIDVOID");
+			return new String(new Integer(id).toString()+" XVOIDVOID");  // Tested, 13 Jun
 		}
 		
 		// We've established we have the correct game object.
@@ -155,8 +160,6 @@ public class SHServerImpl implements SHServer {
 	
 	private Game basicCheck(int id, String token) 
 	  throws NoSuchElementException, SecurityException {
-		// TODO:  Change return type to Game, and throw exceptions for
-		// Bad Game ID and Bad Token.  Catch those exceptions in the caller
 		Game g = findGame(id);
 			
 		if (g == null) {
@@ -175,20 +178,28 @@ public class SHServerImpl implements SHServer {
 		Game g = findGame(id);
 		
 		if (g == null) {
+			DEBUG.print("startGame ERROR - BAD_GAMEID");
+			DEBUG.print("id = "+id+"  token = "+token);
 			return GameOpCodeStatus.BAD_GAMEID;
 		}
 		
 		if (g.checkToken(token) < 0) {
+			DEBUG.print("startGame ERROR - BAD_TOKEN");
+			DEBUG.print("id = "+id+"  token = "+token);
 			return GameOpCodeStatus.BAD_TOKEN;
 		}
 		
 		if (g.getStatus() != BasicGameStatus.START_GAME) {
+			DEBUG.print("startGame ERROR - INVALID_STATE1");
+			DEBUG.print("id = "+id+"  token = "+token);
 			return GameOpCodeStatus.INVALID_STATE;
 		}
 		
 		try {
 			g.startGame();
 		} catch (IllegalStateException e) {
+			DEBUG.print("startGame ERROR - INVALID_STATE2 - Rcvd IllegalStateException");
+			DEBUG.print("id = "+id+"  token = "+token);
 			return GameOpCodeStatus.INVALID_STATE;
 		}
 		
@@ -212,7 +223,7 @@ public class SHServerImpl implements SHServer {
 	}
 
 	@Override
-	public String getHand(int gameid, String token, int playerid) {
+	public synchronized String getHand(int gameid, String token, int playerid) {
 		Game g = null;
 		try {
 			g=basicCheck(gameid,token);
@@ -227,6 +238,8 @@ public class SHServerImpl implements SHServer {
 		try {
 			rtnval = g.getHand(playerid).toString();
 		} catch (ArrayIndexOutOfBoundsException e) {
+			return null;
+		} catch (IllegalStateException e) {
 			return null;
 		}
 		
@@ -246,12 +259,22 @@ public class SHServerImpl implements SHServer {
 	}
 	
 	@Override
-	public GameOpCodeStatus passCards(int id, int playerid, String token, 
+	public int getCurrentTrickNum(int gameid) {
+		Game g = findGame(gameid);
+		
+		if (g == null) {
+			return -1;
+		}
+		
+		return g.getCurrentTrick();
+	}
+	
+	@Override
+	public GameOpCodeStatus passCards(int gameid, int playerid, String token, 
 			                          String card1, String card2, String card3) {
-		// TODO-In Progress:  Implement card passing
 		Game g = null;
 		try {
-			g=basicCheck(id,token);
+			g=basicCheck(gameid,token);
 		} catch (NoSuchElementException e) {
 			return GameOpCodeStatus.BAD_GAMEID;
 		} catch (SecurityException e) {
@@ -262,7 +285,10 @@ public class SHServerImpl implements SHServer {
 			return GameOpCodeStatus.INVALID_STATE;
 		}
 		
-		// TODO:  Implement Game.passRequest(int playerid, Card[] cards)
+		if (card1.isEmpty() || card2.isEmpty() || card3.isEmpty() ) {
+			return GameOpCodeStatus.BAD_PASS;
+		}
+		
 		Card[] cards = new Card[3];
 		try {
 			cards[0] = new Card(card1);
@@ -272,12 +298,264 @@ public class SHServerImpl implements SHServer {
 			return GameOpCodeStatus.BAD_PASS;
 		}
 		
+		Hand h = g.getHand(playerid);
+		DEBUG.print("PassCards: handstr for player "+playerid+" is "+h.toString());
+		DEBUG.print("PassCards: pos for cards[0] ("+card1+") = "+h.cardpos(cards[0]));
+		DEBUG.print("PassCards: pos for cards[1] ("+card2+") = "+h.cardpos(cards[1]));
+		DEBUG.print("PassCards: pos for cards[2] ("+card3+") = "+h.cardpos(cards[2]));
+		if (h.cardpos(cards[0]) == -1 || h.cardpos(cards[1]) == -1 || h.cardpos(cards[2]) == -1) {
+			return GameOpCodeStatus.BAD_PASS;
+		}
+		
 		try {
-			g.passRequest(id, cards);
+			g.passRequest(playerid, cards);
 		} catch (IllegalStateException e) {  // If somebody tries to do two passes
 			return GameOpCodeStatus.INVALID_STATE;
 		}
 		
 		return GameOpCodeStatus.SUCCESS;
+	}
+	
+	@Override
+	public GameOpCodeStatus playCard(int gameid, int playerid, String token, String card) {
+		Game g = null;
+		try {
+			g=basicCheck(gameid,token);
+		} catch (NoSuchElementException e) {
+			return GameOpCodeStatus.BAD_GAMEID;
+		} catch (SecurityException e) {
+			return GameOpCodeStatus.BAD_TOKEN;
+		}
+		if (g.getStatus() != BasicGameStatus.WAITING_TURN) {
+			return GameOpCodeStatus.INVALID_STATE;
+		}
+		
+		// Are we the correct player?
+		if (g.getAdvStatus() != playerid) {
+			return GameOpCodeStatus.NOT_YOUR_TURN;  // Tested
+		}
+		
+		// Check to see whether the card string is empty
+		if (card.isEmpty()) {
+			return GameOpCodeStatus.BLANK_CARD;  // Tested
+		}
+		
+		if (card.length() != 2) {
+			return GameOpCodeStatus.INVALID_CARD; // Tested
+		}
+				
+		// Get the active Trick from the Game class.
+		int curtrick = g.getCurrentTrick();
+		Trick t = g.getTrick(curtrick);
+		
+		// Are we the lead for this trick? (Check the Trick class)
+		int leadplayer = t.getLeaderid();
+		boolean AreWeTheLead = (leadplayer == playerid) ? true : false;
+		
+		// Is this trick 0? (first trick)
+		boolean TrickZero = (curtrick == 0) ? true : false;
+		
+		// Is this card a heart? (*H)
+		boolean IsHeart = (card.charAt(1) == 'H') ? true : false;
+		
+		// Is the card worth points?  (*H or QS)
+		boolean IsPoints = (card.startsWith("QS") || IsHeart) ? true : false;
+		
+		// Does this player have non-points cards?
+		// Does this player have non-hearts cards?
+		Hand h = g.getHand(playerid);
+		
+		// While we just retrieved the hand, make sure we actually have the card in this hand.
+		Card c;
+		try {
+			c = new Card(card);
+		} catch (StringIndexOutOfBoundsException e) {
+			DEBUG.print("StringIndexOutOfBoundsException, game "+gameid+", player "+playerid+" card "+card);
+			return GameOpCodeStatus.INVALID_CARD;
+		} catch (IllegalArgumentException e) {
+			DEBUG.print("IllegalArgumentException, game "+gameid+", player "+playerid+" card "+card);
+			return GameOpCodeStatus.INVALID_CARD;
+		}
+		if (h.cardpos(c) == -1) { // This player does not have the card in question
+			return GameOpCodeStatus.NOT_YOUR_CARD;   // Tested
+		}
+
+		int handscore = h.scoreCards();
+		int heartscount = h.getSuitCards(2); // Hearts is suit 2
+		boolean HasOnlyHearts = (heartscount == h.getSize()) ? true : false;
+		boolean HasOnlyPoints = (HasOnlyHearts || handscore == (h.getSize()+12)) ? true : false;
+		// handscore, if the player has only points w/ one card being the QS will be 12 larger than their
+		// hand size.  Ex: If a player has 10 hearts + QS, the hand score is 23, hand size is 11.
+		
+		// Has a hearts card been played?
+		boolean HeartsBroken = g.HeartsBroken();
+		
+		// Iff this player is not the lead, did they match the lead
+		boolean FollowPlay;
+		try {
+          FollowPlay = (!(leadplayer == playerid) && t.matchLead(c)) ? true : false;
+		} catch (IllegalStateException e) {
+			if (!(leadplayer == playerid)) {
+				throw new IllegalStateException ("Weirdness in playCard, should not see this");
+			} else {
+				FollowPlay = true;
+			}
+		}
+
+        // Does this player have any cards that match the lead suit, iff they are not the lead?
+		boolean MatchSuit;
+		try {
+        	MatchSuit = (!(leadplayer == playerid) && (h.getSuitCards(t.getLeadSuit()) > 0)) ? true : false;
+        } catch (IllegalStateException e) {
+        	if (!(leadplayer == playerid)) {
+        		throw new IllegalStateException ("Weirdness2 in playCard, should not see this");
+        	} else {
+        		MatchSuit = true;
+        	}
+        }
+
+        // Is the card 2C?
+        boolean IsDeuceClubs = (card.equals("2C")) ? true : false;
+		
+		// If Lead && Trick0 && 2C return SUCCESS
+        if (AreWeTheLead && TrickZero && IsDeuceClubs) {
+        	t.playCard(c);
+        	g.incrementPlayer();
+        	return GameOpCodeStatus.SUCCESS; // Tested
+        }
+        
+		// If Lead && Trick0 && !2C return BAD_LEAD_2C
+        if (AreWeTheLead && TrickZero && !IsDeuceClubs) {
+        	DEBUG.print("playCard: BAD_LEAD_2C");
+        	return GameOpCodeStatus.BAD_LEAD_2C; // Tested
+        }
+        
+		// If Trick0 && Points && !PointsCards return BAD_CARD_POINTS
+        if (TrickZero && IsPoints && !HasOnlyPoints) {
+        	DEBUG.print("playCard: BAD_CARD_POINTS");
+        	return GameOpCodeStatus.BAD_CARD_POINTS;
+        }
+        
+		// If Lead && Heart && !PointsPlayed && !OnlyHeartsCards return BAD_LEAD_H
+        if (AreWeTheLead && IsHeart && !HeartsBroken && !HasOnlyHearts) {
+        	DEBUG.print("playCard: BAD_LEAD_H");
+        	if (HeartsBroken) {
+        		DEBUG.print("playCard: HeartsBroken true");
+        	} else {
+        		DEBUG.print("playCard: HeartsBroken false");
+        	}
+        	
+        	if (HasOnlyHearts) {
+        		DEBUG.print("playCard: HasOnlyHearts true");
+        	} else {
+        		DEBUG.print("playCard: HasOnlyHearts false");
+        	}
+        	return GameOpCodeStatus.BAD_LEAD_H;  // Tested
+        }
+        
+		// If !Lead && !PlayerMatchLead && MatchSuit  return BAD_CARD_SUIT
+        if (!AreWeTheLead && !FollowPlay && MatchSuit) {
+        	DEBUG.print("playCard: BAD_CARD_SUIT");
+        	if (FollowPlay) {
+        		DEBUG.print("playCard: FollowPlay is true");
+        	} else {
+        		DEBUG.print("playCard: FollowPlay is false");
+        	}
+        	if (MatchSuit) {
+        	    DEBUG.print("playCard: MatchSuit is true");
+        	} else {
+        		DEBUG.print("playCard: MatchSuit is false");
+        	}
+        	return GameOpCodeStatus.BAD_CARD_SUIT; // Tested
+        }
+		
+		// If Trick is complete, determine taker, assign taken cards to that player,
+		//   and set advstatus
+        t.playCard(c);
+        if (t.getWinner() != -1) {
+        	g.processCurrentTrick();
+        } else {
+        	g.incrementPlayer();
+        }
+		return GameOpCodeStatus.SUCCESS;
+	}
+	
+	@Override
+	public GameOpCodeStatus acknowledgeTrick(int gameid, int playerid, String token) {
+		Game g = null;
+		try {
+			g=basicCheck(gameid,token);
+		} catch (NoSuchElementException e) {
+			return GameOpCodeStatus.BAD_GAMEID;
+		} catch (SecurityException e) {
+			return GameOpCodeStatus.BAD_TOKEN;
+		}
+		
+		if (g.getStatus() != BasicGameStatus.PROCESSING) {
+			return GameOpCodeStatus.INVALID_STATE;
+		}
+		
+		try {
+			g.acknowledgeCompleteTrick(playerid);
+		} catch (IllegalStateException e) {
+			return GameOpCodeStatus.INVALID_STATE;
+		}
+		
+		return GameOpCodeStatus.SUCCESS;
+	}
+	
+	@Override
+	public String getTrick(int gameid, int trickid) {
+		Game g = findGame(gameid);
+		if (g == null) {
+			return null;
+		}
+		
+		Trick t = g.getTrick(trickid);
+		if (t == null) {
+			return null;
+		}
+		
+		return t.toString();
+	}
+	
+	@Override
+	public GameOpCodeStatus scoreHand(int gameid, int playerid) {
+		return GameOpCodeStatus.SUCCESS;
+	}
+	
+	@Override
+	public GameOpCodeStatus setName(int gameid, int playerid, String token, String name) {
+		Game g = null;
+		try {
+			g=basicCheck(gameid,token);
+		} catch (NoSuchElementException e) {
+			return GameOpCodeStatus.BAD_GAMEID;
+		} catch (SecurityException e) {
+			return GameOpCodeStatus.BAD_TOKEN;
+		}
+		
+        g.setPlayerName(playerid, name);
+        return GameOpCodeStatus.SUCCESS;
+	}
+	
+	@Override
+	public String getName(int gameid, int playerid) {
+		Game g = findGame(gameid);
+		if (g == null) {
+			return null;
+		}
+		
+		return g.getPlayerName(playerid);
+	}
+	
+	@Override
+	public String[] getAllNames(int gameid) {
+		Game g = findGame(gameid);
+		if (g == null) {
+			return null;
+		}
+		
+		return g.getAllPlayerNames();
 	}
 }

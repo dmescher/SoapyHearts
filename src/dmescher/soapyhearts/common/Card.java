@@ -91,18 +91,17 @@ public class Card {
 	}
 	
 	public int compare(Card comparee, Card lead) {
-		if (comparee.getSuit() == this.getSuit())
+		if (comparee.getSuit() == lead.getSuit() && this.getSuit() == lead.getSuit())
 			// If this card plus the compared card are the same suit, then whichever
-			// one is higher in rank could take the other
+			// one is higher in rank will take the other, if they both match the lead.
 			return (comparee.getRank() - this.getRank());
-		if (comparee.getSuit() == lead.getSuit())
+		if (comparee.getSuit() == lead.getSuit() && this.getSuit() != lead.getSuit())
 			// If they don't match suit, and the compared card matches the lead, this
 			// card loses
-			return -1;
-		if (this.getSuit() == lead.getSuit())
-			// Seeing whether this card matches the lead.  Since we know the two cards
-			// aren't the same suit, this card wins.
 			return 1;
+		if (this.getSuit() == lead.getSuit() && comparee.getSuit() != lead.getSuit())
+			// Seeing whether this card matches the lead, and the compared card doesn't.
+			return -1;
 		// Neither one matches the lead, so both are equally losers.
 		return 0;
 	}

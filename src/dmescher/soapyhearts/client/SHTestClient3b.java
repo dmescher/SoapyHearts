@@ -5,31 +5,32 @@ import java.net.URL;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
+import dmescher.soapyhearts.client.TextMenu;
+
 import dmescher.soapyhearts.common.BasicGameStatus;
 import dmescher.soapyhearts.common.GameOpCodeStatus;
 import dmescher.soapyhearts.common.SHServer;
 import dmescher.soapyhearts.common.Hand;
 import dmescher.soapyhearts.common.Card;
 
-import java.util.Scanner;
+import dmescher.soapyhearts.common.DEBUG;
 
-public class SHTestClient3 {
-	static Scanner scanner;
-
-	private static char getCharFromConsole() {
-		char ch = scanner.next().charAt(0);
- 		return ch;
-		
-	}
-
+public class SHTestClient3b {
 	private static Card[] pick3(Hand h) {
-		h.displayHand();
+		String[] hand = h.handToArray();
+		if (DEBUG.checkConsole()) {
+			for (int count=0; count<hand.length; count++) {
+				DEBUG.print("DEBUG: Card #"+count+" is "+hand[count]);
+			}
+		}
+		TextMenu tm = new TextMenu(hand);
+		tm.setPrompt("Card letter>> ");
 		
         int charcount = 0;
         char[] charlist = new char[3];
         while (charcount < 3) {
-        	System.out.print("Card letter>> ");
-        	char ch = getCharFromConsole();
+        	tm.display(new String(charlist));
+        	char ch = tm.getChoice();
         	if (!(Character.isLetter(ch))) {
         		System.out.println("Please input a letter."); continue;
         	}
@@ -49,8 +50,6 @@ public class SHTestClient3 {
         	} else {
         		charlist[charcount++] = ch;
         	}
-        	
-        	h.displayHand(charlist);
         }
         
         System.out.println("Selected cards:");
@@ -65,7 +64,6 @@ public class SHTestClient3 {
 	}
 
 	public static void main(String[] args) throws Exception {
-		  scanner = new Scanner(System.in);
 		  URL url = new URL("http://localhost:9901/SHServer?wsdl");
 		  QName qname = new QName("http://server.soapyhearts.dmescher/","SHServerImplService");
 		  Service service = Service.create(url,qname);
@@ -73,12 +71,19 @@ public class SHTestClient3 {
 		  SHServer shs = service.getPort(qname,SHServer.class);
 
 		  boolean player0 = false;
+		  boolean debug = false;
 		  for (String s : args) {
 			  if (s.equals("-player0")) {
 				  player0 = true;
 			  }
+  			  if (s.equals("--DEBUG") == true) {
+				  debug = true; 
+			  }
 		  }
 		  
+		  if (debug == true) {
+			  DEBUG.setConsole(true);
+		  }
 		  int gameid = 0;
 		  
 		  if (player0) {
@@ -150,6 +155,7 @@ public class SHTestClient3 {
 		  }
 		  handstr = shs.getHand(gameid,  token, playerid);
 		  System.out.println("New hand = "+handstr);
+
 	}
 
 }
