@@ -332,12 +332,16 @@ public class SHServerImpl implements SHServer {
 		
 		// Are we the correct player?
 		if (g.getAdvStatus() != playerid) {
-			return GameOpCodeStatus.NOT_YOUR_TURN;
+			return GameOpCodeStatus.NOT_YOUR_TURN;  // Tested
 		}
 		
 		// Check to see whether the card string is empty
 		if (card.isEmpty()) {
-			return GameOpCodeStatus.BLANK_CARD;
+			return GameOpCodeStatus.BLANK_CARD;  // Tested
+		}
+		
+		if (card.length() != 2) {
+			return GameOpCodeStatus.INVALID_CARD; // Tested
 		}
 				
 		// Get the active Trick from the Game class.
@@ -373,7 +377,7 @@ public class SHServerImpl implements SHServer {
 			return GameOpCodeStatus.INVALID_CARD;
 		}
 		if (h.cardpos(c) == -1) { // This player does not have the card in question
-			return GameOpCodeStatus.NOT_YOUR_CARD;
+			return GameOpCodeStatus.NOT_YOUR_CARD;   // Tested
 		}
 
 		int handscore = h.scoreCards();
@@ -417,13 +421,13 @@ public class SHServerImpl implements SHServer {
         if (AreWeTheLead && TrickZero && IsDeuceClubs) {
         	t.playCard(c);
         	g.incrementPlayer();
-        	return GameOpCodeStatus.SUCCESS;
+        	return GameOpCodeStatus.SUCCESS; // Tested
         }
         
 		// If Lead && Trick0 && !2C return BAD_LEAD_2C
         if (AreWeTheLead && TrickZero && !IsDeuceClubs) {
         	DEBUG.print("playCard: BAD_LEAD_2C");
-        	return GameOpCodeStatus.BAD_LEAD_2C;
+        	return GameOpCodeStatus.BAD_LEAD_2C; // Tested
         }
         
 		// If Trick0 && Points && !PointsCards return BAD_CARD_POINTS
@@ -446,7 +450,7 @@ public class SHServerImpl implements SHServer {
         	} else {
         		DEBUG.print("playCard: HasOnlyHearts false");
         	}
-        	return GameOpCodeStatus.BAD_LEAD_H;
+        	return GameOpCodeStatus.BAD_LEAD_H;  // Tested
         }
         
 		// If !Lead && !PlayerMatchLead && MatchSuit  return BAD_CARD_SUIT
@@ -462,7 +466,7 @@ public class SHServerImpl implements SHServer {
         	} else {
         		DEBUG.print("playCard: MatchSuit is false");
         	}
-        	return GameOpCodeStatus.BAD_CARD_SUIT;
+        	return GameOpCodeStatus.BAD_CARD_SUIT; // Tested
         }
 		
 		// If Trick is complete, determine taker, assign taken cards to that player,

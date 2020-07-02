@@ -132,6 +132,36 @@ public class SHTestClientBadCardPlays {
         
         // Trick 1
         System.out.println("Lead player, trick 1 (2) "+y);
+        x = shs.playCard(gamecount, 2, tokenarr[2], "9H");
+        if (x != GameOpCodeStatus.BAD_LEAD_H) {
+        	System.out.println("Failure trick 1, permitted hearts lead on unbroken hearts");
+        	testpass = false;
+        }
+        x = shs.playCard(gamecount, 2, tokenarr[2], "4");
+        if (x != GameOpCodeStatus.INVALID_CARD) {
+        	System.out.println("Failure trick 1, permitted invalid card [string too short]");
+        	testpass = false;
+        }
+        x = shs.playCard(gamecount, 2, tokenarr[2], "QS");
+        if (x != GameOpCodeStatus.NOT_YOUR_CARD) {
+        	System.out.println("Failure trick 1, permitted card not in hand");
+        	testpass = false;
+        }
+        x = shs.playCard(gamecount, 2, tokenarr[2], "");
+        if (x != GameOpCodeStatus.BLANK_CARD) {
+        	System.out.println("Failure trick 1, permitted blank card");
+        	testpass = false;
+        }
+        x = shs.playCard(gamecount, 2, tokenarr[2], "8Y");
+        if (x != GameOpCodeStatus.INVALID_CARD) {
+        	System.out.println("Permitted invalid card [gibberish]");
+        	testpass = false;
+        }
+        x = shs.playCard(gamecount, 2, tokenarr[2], "4S");
+        if (x != GameOpCodeStatus.SUCCESS) {
+        	System.out.println("Failure trick 1, did not permit recovery, player 2");
+        	testpass = false;
+        }
         
         if (testpass) {
         	System.out.println("test passed");
