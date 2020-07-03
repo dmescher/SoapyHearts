@@ -13,7 +13,6 @@ public class SHPublishTest {
 		for (String s: args) {
 			if (s.equals("--DEBUG") == true) {
 				debug = true; 
-				break;
 			}
 			
 			if (s.equals("--round3")) {

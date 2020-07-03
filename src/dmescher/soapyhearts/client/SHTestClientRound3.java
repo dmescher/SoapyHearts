@@ -7,6 +7,7 @@ import javax.xml.ws.Service;
 
 import dmescher.soapyhearts.common.DEBUG;
 import dmescher.soapyhearts.common.GameOpCodeStatus;
+import dmescher.soapyhearts.common.BasicGameStatus;
 import dmescher.soapyhearts.common.SHServer;
 
 public class SHTestClientRound3 {
@@ -44,7 +45,16 @@ public class SHTestClientRound3 {
 	      if (x != GameOpCodeStatus.SUCCESS) {
 	      	System.out.println("Failure at startGame");
 	      }
-	        
+	      x = shs.startRound(gamecount, tokenarr[0]);
+	      if (x != GameOpCodeStatus.SUCCESS) {
+	    	  System.out.println("Failure at startRound");
+	      }
+	      BasicGameStatus y = shs.checkStatus(gamecount);
+	      int z = shs.checkAdvStatus(gamecount);
+	      if (y != BasicGameStatus.WAITING_TURN) {
+	    	  System.out.println("Round 3, game is not waiting for turn.");
+	      }
+	      System.out.println("Waiting on player "+z);
 
 	}
 

@@ -126,9 +126,11 @@ public class Game {
 			// TODO:  Start the game, but only once.  Throw an exception if it is already
 			// started, but catch the exception at the server level, and handle appropriately.
 			
+			DEBUG.print("Game::startGame called while valid");
 			// Set the test round
 			if (isTest) {
 				roundcount = testround;
+				DEBUG.print("Setting roundcount to "+roundcount);
 			}
 		} else {
 			// TODO:  Throw an appropriate IllegalStateException.?
