@@ -15,7 +15,11 @@ public class Game {
 	private Player[] players;
 	private Card[][] passcards;
 	private Trick[] tricks;
+	
+	// Variables for testing purposes
 	static private boolean isTest;
+	static private int deckno=1;
+	static private int testround=0;
 
 	// We're going to assume a basic 4-player game of hearts.  If this expands, we'll
 	// want to modify the constructors to allow variable numbers of players, as well as
@@ -28,6 +32,10 @@ public class Game {
 	
 	public static void setTest(boolean choice) {
 		isTest = choice;
+	}
+	
+	public static void setRound(int newround) {
+		testround = newround;
 	}
 	
 	public BasicGameStatus getStatus() {
@@ -116,12 +124,18 @@ public class Game {
 		if (status == BasicGameStatus.START_GAME) {
 			status = BasicGameStatus.GAME_STARTED;
 			// TODO:  Start the game, but only once.  Throw an exception if it is already
-			// started, but catch the exception at the server level, and handle appropriately.			
+			// started, but catch the exception at the server level, and handle appropriately.
+			
+			// Set the test round
+			if (isTest) {
+				roundcount = testround;
+			}
 		} else {
 			// TODO:  Throw an appropriate IllegalStateException.?
 			// Should I subclass it, or not?  Things to noodle on.
 			// Fairly minor, though, since I'm writing the client.
 		}
+		
 	}
 	
 	public synchronized void startRound() {
@@ -129,7 +143,10 @@ public class Game {
 			deck = Deck.standard52();
 			deck.shuffle();
 		} else {
-			deck = Deck.testDeck1();
+			switch (deckno) {
+			  case 1:  deck = Deck.testDeck1(); break;
+			  default:  deck = Deck.standard52(); deck.shuffle(); break;
+			}
 		}
 
 		

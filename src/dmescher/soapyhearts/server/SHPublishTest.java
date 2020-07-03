@@ -15,6 +15,10 @@ public class SHPublishTest {
 				debug = true; 
 				break;
 			}
+			
+			if (s.equals("--round3")) {
+				Game.setRound(3);
+			}
 		}
 		
 		if (debug == true) {
