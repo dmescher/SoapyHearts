@@ -26,5 +26,6 @@ public interface SHServer {
 		                               String card);
   @WebMethod GameOpCodeStatus acknowledgeTrick(int gameid, int playerid, String token);
   @WebMethod String getTrick(int gameid, int trickid);
-  @WebMethod GameOpCodeStatus scoreHand(int gameid, int playerid);
+  @WebMethod GameOpCodeStatus scoreRound(int gameid);
+
 }

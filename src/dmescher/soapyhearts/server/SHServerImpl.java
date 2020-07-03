@@ -519,10 +519,6 @@ public class SHServerImpl implements SHServer {
 		return t.toString();
 	}
 	
-	@Override
-	public GameOpCodeStatus scoreHand(int gameid, int playerid) {
-		return GameOpCodeStatus.SUCCESS;
-	}
 	
 	@Override
 	public GameOpCodeStatus setName(int gameid, int playerid, String token, String name) {
@@ -557,5 +553,45 @@ public class SHServerImpl implements SHServer {
 		}
 		
 		return g.getAllPlayerNames();
+	}
+	
+	@Override
+	public GameOpCodeStatus scoreRound(int gameid) {
+		Game g = findGame(gameid);
+		if (g == null) {
+			return GameOpCodeStatus.BAD_GAMEID;
+		}
+		
+		if (g.getStatus() != BasicGameStatus.SCORING) {
+			return GameOpCodeStatus.INVALID_STATE;
+		}
+		
+		int initialscores[] = new int[4];
+		int moonshot = -1;
+		for (int count=0; count<4; count++) {
+			initialscores[count] = g.scorePlayer(count);
+			if (initialscores[count] == 26) moonshot=count; // If the player scored 26, they shot the moon
+		}
+		
+		// Second pass, actually add the points to the player objects
+		for (int count=0; count<4; count++) {
+			if (moonshot >= 0 && count != moonshot) g.addPoints(count, 26);
+			if (moonshot == -1) g.addPoints(count, initialscores[count]);
+			if (moonshot >= 0 && count == moonshot) g.addPoints(count, 0);
+		}
+		
+		if (moonshot != -1) {
+			for (int count=0; count<4; count++) {
+				if (count != moonshot)
+					initialscores[count] = 26;
+				else
+					initialscores[count] = 0;
+			}
+		}
+		
+		RoundScoreArr rsa = new RoundScoreArr(initialscores);
+		g.recordRound(rsa);
+		
+		return GameOpCodeStatus.SUCCESS;		
 	}
 }

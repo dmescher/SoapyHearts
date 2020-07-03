@@ -1,6 +1,7 @@
 package dmescher.soapyhearts.common;
 
 import dmescher.soapyhearts.common.Trick;
+import java.util.Vector;
 
 public class Game {
 	private BasicGameStatus status;
@@ -15,6 +16,7 @@ public class Game {
 	private Player[] players;
 	private Card[][] passcards;
 	private Trick[] tricks;
+	private Vector<RoundScoreArr> roundscores;
 	
 	// Variables for testing purposes
 	static private boolean isTest;
@@ -28,6 +30,7 @@ public class Game {
 	public Game() {
 		status = BasicGameStatus.WAITING_JOIN;
 		players = new Player[4];
+		roundscores = new Vector<RoundScoreArr>();
 	}
 	
 	public static void setTest(boolean choice) {
@@ -343,6 +346,15 @@ public class Game {
 		if (playerid > 3) return 0;  // OutOfBounds, but we're not throwing an exception
 		Hand h = players[playerid].getTaken();
 		return h.scoreCards();
+	}
+	
+	public void addPoints(int playerid, int points) {
+		if (playerid > 3) return;  // OutOfBounds, but we're not throwing an exception
+		players[playerid].addPoints(points);
+	}
+	
+	public void recordRound(RoundScoreArr rsa) {
+		roundscores.add(rsa);
 	}
 	
 }

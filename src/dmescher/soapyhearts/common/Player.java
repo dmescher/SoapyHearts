@@ -48,6 +48,10 @@ public class Player {
 		return pts;
 	}
 	
+	public void addPoints(int score) {
+		pts += score;
+	}
+	
 	public Hand getHand() {
 		return hand;
 	}
