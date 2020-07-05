@@ -333,10 +333,19 @@ public class Game {
 			           // a problem.
 		}
 		
+		if (status != BasicGameStatus.SCORING && status != BasicGameStatus.PROCESSING) {
+			return -1;  // We're in a strange state, so we should throw an error code.
+			            // Not sure what's wrong, though, the client is in a weird state.
+		}
+		
 		advstatus -= (0x1 << playerid); // Clear the appropriate bit in advstatus
 		
 		if (advstatus == 0) {
-			startNextTrick();
+			if (status == BasicGameStatus.SCORING) {
+				scoreRound();
+			} else {
+				startNextTrick();
+			}
 		}
 		
 		return 0;
@@ -353,8 +362,36 @@ public class Game {
 		players[playerid].addPoints(points);
 	}
 	
-	public void recordRound(RoundScoreArr rsa) {
+	private void recordRound(RoundScoreArr rsa) {
 		roundscores.add(rsa);
+	}
+	
+	private void scoreRound() {
+		int initialscores[] = new int[4];
+		int moonshot = -1;
+		for (int count=0; count<4; count++) {
+			initialscores[count] = scorePlayer(count);
+			if (initialscores[count] == 26) moonshot=count; // If the player scored 26, they shot the moon
+		}
+		
+		// Second pass, actually add the points to the player objects
+		for (int count=0; count<4; count++) {
+			if (moonshot >= 0 && count != moonshot) addPoints(count, 26);
+			if (moonshot == -1) addPoints(count, initialscores[count]);
+			if (moonshot >= 0 && count == moonshot) addPoints(count, 0);
+		}
+		
+		if (moonshot != -1) {
+			for (int count=0; count<4; count++) {
+				if (count != moonshot)
+					initialscores[count] = 26;
+				else
+					initialscores[count] = 0;
+			}
+		}
+		
+		RoundScoreArr rsa = new RoundScoreArr(roundcount, initialscores);
+		recordRound(rsa);
 	}
 	
 }
