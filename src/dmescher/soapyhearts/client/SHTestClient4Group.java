@@ -451,7 +451,12 @@ public class SHTestClient4Group {
           }
           trickstr = shs.getTrick(gamecount, 12);
           System.out.println("Trick 12 (0+4+7C+3H+3C+5C): "+trickstr);
-          // Trick 12 doesn't need to acknowledge the trick
+          for (int count=0; count<4; count++) {
+        	  GameOpCodeStatus xx = shs.acknowledgeTrick(gamecount, count, tokenarr[count]);
+        	  if (xx != GameOpCodeStatus.SUCCESS) {
+        		  System.out.println("Failure on trick 12 acknowledge, player "+count);
+        	  }
+          }
           
           BasicGameStatus gs = shs.checkStatus(gamecount);
           if (gs != BasicGameStatus.SCORING) {

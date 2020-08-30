@@ -11,6 +11,7 @@ import dmescher.soapyhearts.common.BasicGameStatus;
 import dmescher.soapyhearts.common.SHServer;
 
 public class SHTestClientRound3 {
+	// Test server needs to be started with --round3 for this test to work.
 
 	public static void main(String[] args) throws Exception {
 		  URL url = new URL("http://localhost:9901/SHServer?wsdl");

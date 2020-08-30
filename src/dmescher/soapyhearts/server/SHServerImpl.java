@@ -555,4 +555,28 @@ public class SHServerImpl implements SHServer {
 		return g.getAllPlayerNames();
 	}
 	
+	@Override
+	public int getScore(int gameid, int playerid, int roundid) {
+		Game g = findGame(gameid);
+		if (g == null) {
+			return -1;
+		}
+			
+		if (playerid < 0 || playerid > 3) {
+			return -1;
+		}
+		
+		if (roundid < 0 || roundid > g.getRound()) {
+			return -1;
+		}
+		
+		if (roundid == g.getRound() && g.getStatus() != BasicGameStatus.SCORING) {
+			return -1;
+		}
+		
+		// TODO:  Finish implementation
+		
+		return -1;
+	}
+	
 }

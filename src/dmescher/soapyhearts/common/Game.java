@@ -369,19 +369,22 @@ public class Game {
 	private void scoreRound() {
 		int initialscores[] = new int[4];
 		int moonshot = -1;
+		
+		// Determine point counts, and whether the moon has been shot.
 		for (int count=0; count<4; count++) {
 			initialscores[count] = scorePlayer(count);
 			if (initialscores[count] == 26) moonshot=count; // If the player scored 26, they shot the moon
 		}
 		
 		// Second pass, actually add the points to the player objects
+		// If the moon has been shot, add 26 pts to all players that is not the moon shooter
 		for (int count=0; count<4; count++) {
 			if (moonshot >= 0 && count != moonshot) addPoints(count, 26);
 			if (moonshot == -1) addPoints(count, initialscores[count]);
 			if (moonshot >= 0 && count == moonshot) addPoints(count, 0);
 		}
 		
-		if (moonshot != -1) {
+		if (moonshot != -1) {  // If the moon is shot, set the round score array correctly
 			for (int count=0; count<4; count++) {
 				if (count != moonshot)
 					initialscores[count] = 26;
@@ -392,6 +395,14 @@ public class Game {
 		
 		RoundScoreArr rsa = new RoundScoreArr(roundcount, initialscores);
 		recordRound(rsa);
+	}
+	
+	public int[] getRoundScore(int round) {
+		int[] rtnval = new int[4];
+
+		// TODO:  Implement usefully
+		for (int count=0; count<4; count++) rtnval[count] = 0;
+		return rtnval;
 	}
 	
 }
