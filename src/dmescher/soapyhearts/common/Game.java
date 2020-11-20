@@ -1,6 +1,8 @@
 package dmescher.soapyhearts.common;
 
 import dmescher.soapyhearts.common.Trick;
+
+import java.util.Arrays;
 import java.util.Vector;
 
 public class Game {
@@ -400,8 +402,12 @@ public class Game {
 	public int[] getRoundScore(int round) {
 		int[] rtnval = new int[4];
 
-		// TODO:  Implement usefully
-		for (int count=0; count<4; count++) rtnval[count] = 0;
+		if (round > roundscores.size()) {
+			Arrays.fill(rtnval, -1);
+			return rtnval;
+		}
+		RoundScoreArr rsa = roundscores.get(round);
+		rtnval = rsa.getScores();
 		return rtnval;
 	}
 	

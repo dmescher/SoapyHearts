@@ -13,6 +13,7 @@ public class ConsoleTest {
 		
 	}
 
+    @SuppressWarnings("deprecation")
 	public static void main(String[] args) throws Exception {
         Deck deck = Deck.standard52();
         deck.shuffle();

@@ -22,6 +22,7 @@ public class SHTestClient3 {
 		
 	}
 
+	@SuppressWarnings("deprecation")
 	private static Card[] pick3(Hand h) {
 		h.displayHand();
 		
